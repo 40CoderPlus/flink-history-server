@@ -1,0 +1,3 @@
+rootProject.name = 'flink-history-server'
+include 'history-server-spring-boot'
+include 'history-server-embedded-server'
