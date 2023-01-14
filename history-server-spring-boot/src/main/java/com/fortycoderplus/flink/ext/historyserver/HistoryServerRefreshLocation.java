@@ -1,5 +1,5 @@
 /*
- * (c) Copyright 2023 40CoderPlus. All rights reserved.
+ * (c) Copyright 2017-2022 40CoderPlus. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,16 +20,15 @@
 
 package com.fortycoderplus.flink.ext.historyserver;
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import lombok.Builder;
+import lombok.Data;
+import org.apache.flink.core.fs.FileSystem;
+import org.apache.flink.core.fs.Path;
 
-@Configuration
-@EnableConfigurationProperties(HistoryServerProperties.class)
-public class HistoryServerAutoConfigure {
+@Data
+@Builder
+public class HistoryServerRefreshLocation {
 
-    @Bean
-    public HistoryServerArchiveFetcher historyServerArchiveFetcher() {
-        return new HistoryServerArchiveFetcher();
-    }
+    private Path path;
+    private FileSystem fs;
 }

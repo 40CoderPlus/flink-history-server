@@ -1,4 +1,7 @@
 dependencies {
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+    //flink
+    implementation "org.apache.flink:flink-core:$flinkVersion"
 }

@@ -24,9 +24,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class FlinkHistoryServerEmbeddedServer {
+public class FlinkHistoryServerEmbedded {
 
     public static void main(String[] args) {
-        SpringApplication.run(FlinkHistoryServerEmbeddedServer.class, args);
+        SpringApplication.run(FlinkHistoryServerEmbedded.class, args);
     }
 }

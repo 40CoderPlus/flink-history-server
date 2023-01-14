@@ -20,16 +20,12 @@
 
 package com.fortycoderplus.flink.ext.historyserver;
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
-@Configuration
-@EnableConfigurationProperties(HistoryServerProperties.class)
-public class HistoryServerAutoConfigure {
+@Slf4j
+public class HistoryServerArchiveFetcher {
 
-    @Bean
-    public HistoryServerArchiveFetcher historyServerArchiveFetcher() {
-        return new HistoryServerArchiveFetcher();
-    }
+    // fetch flink job history
+    public void fetchArchives(List<HistoryServerRefreshLocation> refreshDirs) {}
 }
