@@ -1,5 +1,5 @@
 /*
- * (c) Copyright 2017-2022 40CoderPlus. All rights reserved.
+ * (c) Copyright 2023 40CoderPlus. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,14 +23,14 @@ package com.fortycoderplus.flink.ext.historyserver;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
+import org.apache.flink.core.fs.FileStatus;
 import org.apache.flink.core.fs.FileSystem;
-import org.apache.flink.core.fs.Path;
 
 @Builder
 @Data
 @ToString
-public class HistoryServerRefreshLocation {
+public class HistoryServerJobArchive {
 
-    private Path path;
+    private FileStatus fileStatus;
     private FileSystem fs;
 }
