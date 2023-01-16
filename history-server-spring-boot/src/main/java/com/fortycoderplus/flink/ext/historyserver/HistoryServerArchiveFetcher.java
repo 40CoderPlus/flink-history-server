@@ -55,14 +55,6 @@ public class HistoryServerArchiveFetcher {
         this.archivedJsonConsumer = archivedJsonConsumer;
     }
 
-    private final Consumer<HistoryServerJobArchive> deleteArchiveConsumer = archive -> {
-        try {
-            archive.getFs().delete(archive.getFileStatus().getPath(), false);
-        } catch (IOException ex) {
-            logger.error("Archive file {} delete yet.", archive.getFileStatus().getPath(), ex);
-        }
-    };
-
     // fetch flink job history
     public void fetchArchives(List<HistoryServerRefreshLocation> refreshDirs) {
         refreshDirs.stream()
@@ -83,7 +75,7 @@ public class HistoryServerArchiveFetcher {
                     Path jobArchivePath = archive.getFileStatus().getPath();
                     String jobID = jobArchivePath.getName();
                     if (!isValidJobID(jobID, archive.getRootPath().getPath())) {
-                        deleteArchiveConsumer.accept(archive);
+                        deleteArchive(archive);
                     } else {
                         logger.info("Processing archive {}.", jobArchivePath);
                         try {
@@ -93,7 +85,7 @@ public class HistoryServerArchiveFetcher {
                         } catch (Exception ex) {
                             logger.error("Consume archived jsons from path {} failed.", jobArchivePath, ex);
                         }
-                        deleteArchiveConsumer.accept(archive);
+                        deleteArchive(archive);
                     }
                 });
     }
@@ -162,6 +154,14 @@ public class HistoryServerArchiveFetcher {
                 // occurs if the archive is empty or any of the expected fields are not present
                 throw new IOException("Job archive (" + file.getPath() + ") did not conform to expected format.");
             }
+        }
+    }
+
+    private static void deleteArchive(HistoryServerJobArchive archive) {
+        try {
+            archive.getFs().delete(archive.getFileStatus().getPath(), false);
+        } catch (IOException ex) {
+            logger.error("Archive file {} delete yet.", archive.getFileStatus().getPath(), ex);
         }
     }
 }
