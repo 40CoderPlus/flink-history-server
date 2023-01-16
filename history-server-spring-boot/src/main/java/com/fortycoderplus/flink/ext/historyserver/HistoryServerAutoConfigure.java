@@ -20,6 +20,9 @@
 
 package com.fortycoderplus.flink.ext.historyserver;
 
+import java.util.function.Consumer;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +31,16 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(HistoryServerProperties.class)
 public class HistoryServerAutoConfigure {
 
+    @Bean("archivedJsonConsumer")
+    @ConditionalOnMissingBean
+    public Consumer<HistoryServerArchivedJson> archivedJsonConsumer() {
+        return archivedJson ->
+                LoggerFactory.getLogger("ArchivedJsonConsumer").info("Processing archived json {}.", archivedJson);
+    }
+
     @Bean
-    public HistoryServerArchiveFetcher historyServerArchiveFetcher() {
-        return new HistoryServerArchiveFetcher();
+    public HistoryServerArchiveFetcher historyServerArchiveFetcher(
+            Consumer<HistoryServerArchivedJson> archivedJsonConsumer) {
+        return new HistoryServerArchiveFetcher(archivedJsonConsumer);
     }
 }

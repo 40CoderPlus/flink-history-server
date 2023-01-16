@@ -23,16 +23,13 @@ package com.fortycoderplus.flink.ext.historyserver;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
-import org.apache.flink.core.fs.FileStatus;
-import org.apache.flink.core.fs.FileSystem;
-import org.apache.flink.core.fs.Path;
 
 @Builder
 @Data
-@ToString
-public class HistoryServerJobArchive {
+@ToString(exclude = "json")
+public class HistoryServerArchivedJson {
 
-    private FileStatus fileStatus;
-    private FileSystem fs;
-    private Path rootPath;
+    private String jobId;
+    private String path;
+    private String json;
 }

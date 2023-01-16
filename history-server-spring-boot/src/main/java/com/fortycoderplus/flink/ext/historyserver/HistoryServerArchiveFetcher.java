@@ -20,12 +20,148 @@
 
 package com.fortycoderplus.flink.ext.historyserver;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.flink.api.common.JobID;
+import org.apache.flink.core.fs.FSDataInputStream;
+import org.apache.flink.core.fs.FileStatus;
+import org.apache.flink.core.fs.FileSystem;
+import org.apache.flink.core.fs.Path;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.flink.util.IOUtils;
+import org.apache.flink.util.jackson.JacksonMapperFactory;
 
+/**
+ * some code copy from flink
+ */
 @Slf4j
 public class HistoryServerArchiveFetcher {
 
+    private static final ObjectMapper mapper = JacksonMapperFactory.createObjectMapper();
+    private static final String ARCHIVE = "archive";
+    private static final String PATH = "path";
+    private static final String JSON = "json";
+
+    private final Consumer<HistoryServerArchivedJson> archivedJsonConsumer;
+
+    public HistoryServerArchiveFetcher(Consumer<HistoryServerArchivedJson> archivedJsonConsumer) {
+        this.archivedJsonConsumer = archivedJsonConsumer;
+    }
+
+    private final Consumer<HistoryServerJobArchive> deleteArchiveConsumer = archive -> {
+        try {
+            archive.getFs().delete(archive.getFileStatus().getPath(), false);
+        } catch (IOException ex) {
+            logger.error("Archive file {} delete yet.", archive.getFileStatus().getPath(), ex);
+        }
+    };
+
     // fetch flink job history
-    public void fetchArchives(List<HistoryServerRefreshLocation> refreshDirs) {}
+    public void fetchArchives(List<HistoryServerRefreshLocation> refreshDirs) {
+        refreshDirs.stream()
+                .flatMap(dir -> {
+                    FileStatus[] jobArchives = new FileStatus[0];
+                    try {
+                        jobArchives = listArchives(dir.getFs(), dir.getPath());
+                    } catch (IOException e) {
+                        logger.error("Failed to access job archive location for path {}.", dir, e);
+                    }
+                    return Stream.of(jobArchives).map(archive -> HistoryServerJobArchive.builder()
+                            .fileStatus(archive)
+                            .fs(dir.getFs())
+                            .rootPath(dir.getPath())
+                            .build());
+                })
+                .forEach(archive -> {
+                    Path jobArchivePath = archive.getFileStatus().getPath();
+                    String jobID = jobArchivePath.getName();
+                    if (!isValidJobID(jobID, archive.getRootPath().getPath())) {
+                        deleteArchiveConsumer.accept(archive);
+                    } else {
+                        logger.info("Processing archive {}.", jobArchivePath);
+                        try {
+                            List<HistoryServerArchivedJson> archivedJsons = getArchivedJsons(jobID, jobArchivePath);
+                            archivedJsons.forEach(archivedJsonConsumer);
+                        } catch (IOException ignore) {
+                        } catch (Exception ex) {
+                            logger.error("Consume archived jsons from path {} failed.", jobArchivePath, ex);
+                        }
+                        deleteArchiveConsumer.accept(archive);
+                    }
+                });
+    }
+
+    /**
+     * @param refreshFS flink filesystem. such as hdfs/s3
+     * @param refreshDir the path to get flink job history
+     * @return FileStatus[] the array of job history content
+     * @throws IOException io exception
+     */
+    private static FileStatus[] listArchives(FileSystem refreshFS, Path refreshDir) throws IOException {
+        // contents of /:refreshDir
+        FileStatus[] jobArchives = refreshFS.listStatus(refreshDir);
+        // the entire refreshDirectory was removed
+        return Objects.requireNonNullElseGet(jobArchives, () -> new FileStatus[0]);
+    }
+
+    /**
+     * copy from flink
+     *
+     * @param jobId flink job id
+     * @param refreshDir flink history archive directory
+     * @return boolean.
+     */
+    private static boolean isValidJobID(String jobId, String refreshDir) {
+        try {
+            JobID.fromHexString(jobId);
+            return true;
+        } catch (IllegalArgumentException iae) {
+            logger.error(
+                    "Archive directory {} contained file with unexpected name {}. Ignoring file.",
+                    refreshDir,
+                    jobId,
+                    iae);
+            return false;
+        }
+    }
+
+    /**
+     * Reads the given archive file and returns a {@link List} of contained {@link
+     * HistoryServerArchivedJson}.
+     *
+     * @param file archive to extract
+     * @return collection of archived jsons
+     * @throws IOException if the file can't be opened, read or doesn't contain valid json
+     */
+    public static List<HistoryServerArchivedJson> getArchivedJsons(String jobId, Path file) throws IOException {
+        try (FSDataInputStream input = file.getFileSystem().open(file);
+                ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            IOUtils.copyBytes(input, output);
+
+            try {
+                JsonNode archive = mapper.readTree(output.toByteArray());
+                List<HistoryServerArchivedJson> archives = new ArrayList<>();
+                for (JsonNode archivePart : archive.get(ARCHIVE)) {
+                    String path = archivePart.get(PATH).asText();
+                    String json = archivePart.get(JSON).asText();
+                    archives.add(HistoryServerArchivedJson.builder()
+                            .jobId(jobId)
+                            .path(path)
+                            .json(json)
+                            .build());
+                }
+                return archives;
+            } catch (NullPointerException npe) {
+                // occurs if the archive is empty or any of the expected fields are not present
+                throw new IOException("Job archive (" + file.getPath() + ") did not conform to expected format.");
+            }
+        }
+    }
 }
