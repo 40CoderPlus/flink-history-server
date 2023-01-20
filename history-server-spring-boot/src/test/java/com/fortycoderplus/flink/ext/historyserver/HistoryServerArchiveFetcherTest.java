@@ -20,28 +20,30 @@
 
 package com.fortycoderplus.flink.ext.historyserver;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.File;
 import java.util.List;
 import java.util.function.Consumer;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.apache.flink.core.fs.FileSystem;
+import org.apache.flink.core.fs.Path;
+import org.junit.jupiter.api.Test;
 
-@Configuration
-@EnableConfigurationProperties(HistoryServerProperties.class)
-public class HistoryServerAutoConfigure {
+class HistoryServerArchiveFetcherTest {
 
-    @Bean("archivedJsonConsumer")
-    @ConditionalOnMissingBean
-    public Consumer<List<HistoryServerArchivedJson>> archivedJsonConsumer() {
-        return archivedJson ->
-                LoggerFactory.getLogger("ArchivedJsonConsumer").info("Processing archived json {}.", archivedJson);
-    }
-
-    @Bean
-    public HistoryServerArchiveFetcher historyServerArchiveFetcher(
-            Consumer<List<HistoryServerArchivedJson>> archivedJsonConsumer) {
-        return new HistoryServerArchiveFetcher(archivedJsonConsumer);
+    @Test
+    void fetchArchives() {
+        FileSystem fs = FileSystem.getLocalFileSystem();
+        Consumer<List<HistoryServerArchivedJson>> testConsumer = jsons -> assertEquals(
+                1L,
+                jsons.stream()
+                        .map(HistoryServerArchivedJson::getJobId)
+                        .distinct()
+                        .count());
+        HistoryServerArchiveFetcher fetcher = new HistoryServerArchiveFetcher(testConsumer, archive -> {});
+        fetcher.fetchArchives(List.of(HistoryServerRefreshLocation.builder()
+                .fs(fs)
+                .path(Path.fromLocalFile(new File("data")))
+                .build()));
     }
 }

@@ -22,11 +22,12 @@ package com.fortycoderplus.flink.ext.historyserver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.JobID;
 import org.apache.flink.core.fs.FSDataInputStream;
@@ -38,21 +39,29 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMap
 import org.apache.flink.util.IOUtils;
 import org.apache.flink.util.jackson.JacksonMapperFactory;
 
-/**
- * some code copy from flink
- */
 @Slf4j
 public class HistoryServerArchiveFetcher {
 
     private static final ObjectMapper mapper = JacksonMapperFactory.createObjectMapper();
+    private static final Consumer<HistoryServerJobArchive> defaultConsumerAfterFetch =
+            HistoryServerArchiveFetcher::deleteArchive;
     private static final String ARCHIVE = "archive";
     private static final String PATH = "path";
     private static final String JSON = "json";
 
-    private final Consumer<HistoryServerArchivedJson> archivedJsonConsumer;
+    private final Consumer<List<HistoryServerArchivedJson>> archivedJsonConsumer;
+    private final Consumer<HistoryServerJobArchive> consumerAfterFetch;
 
-    public HistoryServerArchiveFetcher(Consumer<HistoryServerArchivedJson> archivedJsonConsumer) {
+    public HistoryServerArchiveFetcher(Consumer<List<HistoryServerArchivedJson>> archivedJsonConsumer) {
         this.archivedJsonConsumer = archivedJsonConsumer;
+        consumerAfterFetch = defaultConsumerAfterFetch;
+    }
+
+    public HistoryServerArchiveFetcher(
+            Consumer<List<HistoryServerArchivedJson>> archivedJsonConsumer,
+            Consumer<HistoryServerJobArchive> consumerAfterFetch) {
+        this.archivedJsonConsumer = archivedJsonConsumer;
+        this.consumerAfterFetch = consumerAfterFetch;
     }
 
     // fetch flink job history
@@ -75,17 +84,16 @@ public class HistoryServerArchiveFetcher {
                     Path jobArchivePath = archive.getFileStatus().getPath();
                     String jobID = jobArchivePath.getName();
                     if (!isValidJobID(jobID, archive.getRootPath().getPath())) {
-                        deleteArchive(archive);
+                        deleteArchive(archive, false);
                     } else {
                         logger.info("Processing archive {}.", jobArchivePath);
                         try {
-                            List<HistoryServerArchivedJson> archivedJsons = getArchivedJsons(jobID, jobArchivePath);
-                            archivedJsons.forEach(archivedJsonConsumer);
+                            archivedJsonConsumer.accept(getArchivedJsons(jobID, jobArchivePath));
                         } catch (IOException ignore) {
                         } catch (Exception ex) {
                             logger.error("Consume archived jsons from path {} failed.", jobArchivePath, ex);
                         }
-                        deleteArchive(archive);
+                        consumerAfterFetch.accept(archive);
                     }
                 });
     }
@@ -132,24 +140,24 @@ public class HistoryServerArchiveFetcher {
      * @return collection of archived jsons
      * @throws IOException if the file can't be opened, read or doesn't contain valid json
      */
-    public static List<HistoryServerArchivedJson> getArchivedJsons(String jobId, Path file) throws IOException {
+    private static List<HistoryServerArchivedJson> getArchivedJsons(String jobId, Path file) throws IOException {
         try (FSDataInputStream input = file.getFileSystem().open(file);
                 ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             IOUtils.copyBytes(input, output);
 
             try {
                 JsonNode archive = mapper.readTree(output.toByteArray());
-                List<HistoryServerArchivedJson> archives = new ArrayList<>();
-                for (JsonNode archivePart : archive.get(ARCHIVE)) {
-                    String path = archivePart.get(PATH).asText();
-                    String json = archivePart.get(JSON).asText();
-                    archives.add(HistoryServerArchivedJson.builder()
-                            .jobId(jobId)
-                            .path(path)
-                            .json(json)
-                            .build());
-                }
-                return archives;
+                return StreamSupport.stream(archive.get(ARCHIVE).spliterator(), false)
+                        .map(part -> {
+                            String path = part.get(PATH).asText();
+                            String json = part.get(JSON).asText();
+                            return HistoryServerArchivedJson.builder()
+                                    .jobId(jobId)
+                                    .path(path)
+                                    .json(json)
+                                    .build();
+                        })
+                        .collect(Collectors.toList());
             } catch (NullPointerException npe) {
                 // occurs if the archive is empty or any of the expected fields are not present
                 throw new IOException("Job archive (" + file.getPath() + ") did not conform to expected format.");
@@ -158,10 +166,24 @@ public class HistoryServerArchiveFetcher {
     }
 
     private static void deleteArchive(HistoryServerJobArchive archive) {
+        deleteArchive(archive, true);
+    }
+
+    private static void deleteArchive(HistoryServerJobArchive archive, boolean valid) {
         try {
             archive.getFs().delete(archive.getFileStatus().getPath(), false);
         } catch (IOException ex) {
-            logger.error("Archive file {} delete yet.", archive.getFileStatus().getPath(), ex);
+            if (valid) {
+                logger.error(
+                        "Archive file {} delete failed.",
+                        archive.getFileStatus().getPath(),
+                        ex);
+            } else {
+                logger.warn(
+                        "Invalid archive file {} delete failed.",
+                        archive.getFileStatus().getPath(),
+                        ex);
+            }
         }
     }
 }
