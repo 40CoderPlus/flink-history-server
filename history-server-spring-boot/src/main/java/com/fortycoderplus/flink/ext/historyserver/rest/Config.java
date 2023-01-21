@@ -21,43 +21,43 @@
 package com.fortycoderplus.flink.ext.historyserver.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 @Builder
+@AllArgsConstructor
 @Data
-public class Job {
+public class Config {
+    @JsonProperty("refresh-interval")
+    private final long refreshInterval;
 
-    private String jid;
-    private String name;
-    private String state;
+    @JsonProperty("timezone-name")
+    private final String timeZoneName;
 
-    @JsonProperty("start-time")
-    private long startTime;
+    @JsonProperty("timezone-offset")
+    private final int timeZoneOffset;
 
-    @JsonProperty("end-time")
-    private long endTime;
+    @JsonProperty("flink-version")
+    private final String flinkVersion;
 
-    private long duration;
+    @JsonProperty("flink-revision")
+    private final String flinkRevision;
 
-    @JsonProperty("last-modification")
-    private long lastModification;
-
-    private Tasks tasks;
+    @JsonProperty("features")
+    private final Features features;
 
     @Builder
+    @AllArgsConstructor
     @Data
-    public static class Tasks {
-        private int total;
-        private int created;
-        private int scheduled;
-        private int deploying;
-        private int running;
-        private int finished;
-        private int canceling;
-        private int canceled;
-        private int failed;
-        private int reconciling;
-        private int initializing;
+    public static class Features {
+        @JsonProperty("web-submit")
+        private final boolean webSubmitEnabled;
+
+        @JsonProperty("web-cancel")
+        private final boolean webCancelEnabled;
+
+        @JsonProperty("web-history")
+        private final boolean isHistoryServer;
     }
 }

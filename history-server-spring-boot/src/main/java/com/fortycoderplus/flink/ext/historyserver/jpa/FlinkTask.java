@@ -18,32 +18,23 @@
  * limitations under the License.
  */
 
-package com.fortycoderplus.flink.ext.historyserver.rest;
+package com.fortycoderplus.flink.ext.historyserver.jpa;
 
-import java.util.List;
+import javax.persistence.Embeddable;
+import lombok.Data;
 
-public interface FlinkRestService {
-
-    /**
-     * For Flink Rest Endpoint : /overview
-     *
-     * @return Overview
-     */
-    Overview overview();
-
-    /**
-     * For Flink Rest Endpoint : /jobs/overview
-     *
-     * @param n number of page size.
-     * @return List<Job>
-     */
-    List<Job> topN(int n);
-
-    /**
-     * For Flink Rest Endpoint : /jobs/{id}/**
-     * @param jid  Job ID, path variable of {id}
-     * @param path the path of suffix /jobs/{id}
-     * @return JobXJson
-     */
-    JobXJson json(String jid, String path);
+@Data
+@Embeddable
+public class FlinkTask {
+    private int total;
+    private int created;
+    private int scheduled;
+    private int deploying;
+    private int running;
+    private int finished;
+    private int canceling;
+    private int canceled;
+    private int failed;
+    private int reconciling;
+    private int initializing;
 }

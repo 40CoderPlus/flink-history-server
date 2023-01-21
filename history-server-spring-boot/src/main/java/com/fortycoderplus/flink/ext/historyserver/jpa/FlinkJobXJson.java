@@ -18,46 +18,34 @@
  * limitations under the License.
  */
 
-package com.fortycoderplus.flink.ext.historyserver.rest;
+package com.fortycoderplus.flink.ext.historyserver.jpa;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.UUID;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 
 @Builder
-@Data
-public class Job {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "flink_ext_job_json")
+public class FlinkJobXJson extends AbstractPersistable<UUID> {
 
+    // redundancy filed for query json by jid and path
     private String jid;
-    private String name;
-    private String state;
+    private String path;
+    private String json;
 
-    @JsonProperty("start-time")
-    private long startTime;
-
-    @JsonProperty("end-time")
-    private long endTime;
-
-    private long duration;
-
-    @JsonProperty("last-modification")
-    private long lastModification;
-
-    private Tasks tasks;
-
-    @Builder
-    @Data
-    public static class Tasks {
-        private int total;
-        private int created;
-        private int scheduled;
-        private int deploying;
-        private int running;
-        private int finished;
-        private int canceling;
-        private int canceled;
-        private int failed;
-        private int reconciling;
-        private int initializing;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    private FlinkJob job;
 }

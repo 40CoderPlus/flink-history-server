@@ -20,44 +20,33 @@
 
 package com.fortycoderplus.flink.ext.historyserver.rest;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
+import java.util.List;
 
-@Builder
-@Data
-public class Job {
+/**
+ * Notice: just for Flink History Server Rest API
+ */
+public interface FlinkRestApiService {
 
-    private String jid;
-    private String name;
-    private String state;
+    /**
+     * For Flink Rest Endpoint : /overview
+     *
+     * @return Overview
+     */
+    Overview overview();
 
-    @JsonProperty("start-time")
-    private long startTime;
+    /**
+     * For Flink Rest Endpoint : /jobs/overview
+     * Order by job end time
+     * @param n number of page size.
+     * @return List<Job>
+     */
+    List<Job> latest(int n);
 
-    @JsonProperty("end-time")
-    private long endTime;
-
-    private long duration;
-
-    @JsonProperty("last-modification")
-    private long lastModification;
-
-    private Tasks tasks;
-
-    @Builder
-    @Data
-    public static class Tasks {
-        private int total;
-        private int created;
-        private int scheduled;
-        private int deploying;
-        private int running;
-        private int finished;
-        private int canceling;
-        private int canceled;
-        private int failed;
-        private int reconciling;
-        private int initializing;
-    }
+    /**
+     * For Flink Rest Endpoint : /jobs/{id}/**
+     * @param jid  Job ID, path variable of {id}
+     * @param path the path of suffix /jobs/{id}
+     * @return JobXJson
+     */
+    JobXJson json(String jid, String path);
 }

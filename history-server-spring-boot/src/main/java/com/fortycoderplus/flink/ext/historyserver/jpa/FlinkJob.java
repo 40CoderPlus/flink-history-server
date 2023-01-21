@@ -18,46 +18,45 @@
  * limitations under the License.
  */
 
-package com.fortycoderplus.flink.ext.historyserver.rest;
+package com.fortycoderplus.flink.ext.historyserver.jpa;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fortycoderplus.flink.ext.historyserver.rest.JobState;
+import java.util.List;
+import java.util.UUID;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 
 @Builder
-@Data
-public class Job {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "flink_ext_job")
+public class FlinkJob extends AbstractPersistable<UUID> {
 
     private String jid;
     private String name;
-    private String state;
 
-    @JsonProperty("start-time")
+    @Enumerated(EnumType.STRING)
+    private JobState state;
+
     private long startTime;
-
-    @JsonProperty("end-time")
     private long endTime;
-
     private long duration;
-
-    @JsonProperty("last-modification")
     private long lastModification;
+    private FlinkTask task;
 
-    private Tasks tasks;
-
-    @Builder
-    @Data
-    public static class Tasks {
-        private int total;
-        private int created;
-        private int scheduled;
-        private int deploying;
-        private int running;
-        private int finished;
-        private int canceling;
-        private int canceled;
-        private int failed;
-        private int reconciling;
-        private int initializing;
-    }
+    @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
+    private List<FlinkJobXJson> xJsons;
 }

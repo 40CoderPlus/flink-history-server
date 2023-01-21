@@ -20,44 +20,29 @@
 
 package com.fortycoderplus.flink.ext.historyserver.rest;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
+import java.util.Arrays;
 
-@Builder
-@Data
-public class Job {
+public enum JobState {
+    RUNNING("jobs-running"),
+    CANCELED("jobs-cancelled"),
+    FAILED("jobs-failed"),
 
-    private String jid;
-    private String name;
-    private String state;
+    FINISHED("jobs-finished");
 
-    @JsonProperty("start-time")
-    private long startTime;
+    private final String jsonProperty;
 
-    @JsonProperty("end-time")
-    private long endTime;
+    JobState(String jsonProperty) {
+        this.jsonProperty = jsonProperty;
+    }
 
-    private long duration;
+    public String getJsonProperty() {
+        return jsonProperty;
+    }
 
-    @JsonProperty("last-modification")
-    private long lastModification;
-
-    private Tasks tasks;
-
-    @Builder
-    @Data
-    public static class Tasks {
-        private int total;
-        private int created;
-        private int scheduled;
-        private int deploying;
-        private int running;
-        private int finished;
-        private int canceling;
-        private int canceled;
-        private int failed;
-        private int reconciling;
-        private int initializing;
+    public static JobState from(String state) {
+        return Arrays.stream(JobState.values())
+                .filter(s -> s.name().equalsIgnoreCase(state))
+                .findAny()
+                .orElse(FINISHED);
     }
 }

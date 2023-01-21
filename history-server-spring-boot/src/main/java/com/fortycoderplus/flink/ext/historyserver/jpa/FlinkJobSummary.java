@@ -20,25 +20,21 @@
 
 package com.fortycoderplus.flink.ext.historyserver.jpa;
 
-import com.fortycoderplus.flink.ext.historyserver.rest.FlinkRestService;
-import com.fortycoderplus.flink.ext.historyserver.rest.Job;
-import com.fortycoderplus.flink.ext.historyserver.rest.JobXJson;
-import com.fortycoderplus.flink.ext.historyserver.rest.Overview;
-import java.util.List;
+import com.fortycoderplus.flink.ext.historyserver.rest.JobState;
 
-public class FlinkRestServiceJpa implements FlinkRestService {
-    @Override
-    public Overview overview() {
-        return null;
-    }
+public interface FlinkJobSummary {
 
-    @Override
-    public List<Job> topN(int n) {
-        return null;
-    }
+    /**
+     * Flink Job State
+     *
+     * @return JobState
+     */
+    JobState getState();
 
-    @Override
-    public JobXJson json(String jid, String path) {
-        return null;
-    }
+    /**
+     * count group by state
+     *
+     * @return long
+     */
+    long getCount();
 }
