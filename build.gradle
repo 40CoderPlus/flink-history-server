@@ -56,6 +56,12 @@ subprojects {
         implementation 'org.mapstruct:mapstruct:1.5.2.Final'
         annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.2.Final'
 
+        implementation 'com.fasterxml.jackson.core:jackson-annotations'
+        implementation 'com.fasterxml.jackson.core:jackson-core'
+        implementation 'com.fasterxml.jackson.core:jackson-databind'
+        implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+        implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
+
         // test:junit
         testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
         testImplementation "org.junit.jupiter:junit-jupiter-engine:$junitVersion"

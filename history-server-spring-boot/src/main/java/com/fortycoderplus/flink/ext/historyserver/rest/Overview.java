@@ -20,9 +20,9 @@
 
 package com.fortycoderplus.flink.ext.historyserver.rest;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonProperty;
 
 @Builder
 @Data

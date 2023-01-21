@@ -20,6 +20,11 @@
 
 package com.fortycoderplus.flink.ext.historyserver;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -34,15 +39,16 @@ import org.apache.flink.core.fs.FSDataInputStream;
 import org.apache.flink.core.fs.FileStatus;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.util.IOUtils;
-import org.apache.flink.util.jackson.JacksonMapperFactory;
 
 @Slf4j
 public class HistoryServerArchiveFetcher {
 
-    private static final ObjectMapper mapper = JacksonMapperFactory.createObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .registerModule((new Jdk8Module()))
+            .disable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     private static final Consumer<HistoryServerJobArchive> defaultConsumerAfterFetch =
             HistoryServerArchiveFetcher::deleteArchive;
     private static final String ARCHIVE = "archive";
