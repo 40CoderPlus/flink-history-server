@@ -23,21 +23,11 @@ package com.fortycoderplus.flink.ext.historyserver.rest;
 import java.util.Arrays;
 
 public enum JobState {
-    RUNNING("jobs-running"),
-    CANCELED("jobs-cancelled"),
-    FAILED("jobs-failed"),
+    RUNNING,
+    CANCELED,
+    FAILED,
 
-    FINISHED("jobs-finished");
-
-    private final String jsonProperty;
-
-    JobState(String jsonProperty) {
-        this.jsonProperty = jsonProperty;
-    }
-
-    public String getJsonProperty() {
-        return jsonProperty;
-    }
+    FINISHED;
 
     public static JobState from(String state) {
         return Arrays.stream(JobState.values())

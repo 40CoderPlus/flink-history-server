@@ -53,14 +53,19 @@ subprojects {
         compileOnly "org.projectlombok:lombok:1.18.24"
         annotationProcessor "org.projectlombok:lombok:1.18.24"
         // mapstruct
-        implementation 'org.mapstruct:mapstruct:1.5.2.Final'
-        annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.2.Final'
+        implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+        annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 
+        // jackson
         implementation 'com.fasterxml.jackson.core:jackson-annotations'
         implementation 'com.fasterxml.jackson.core:jackson-core'
         implementation 'com.fasterxml.jackson.core:jackson-databind'
         implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
         implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
+
+        // flink
+        implementation "org.apache.flink:flink-core:$flinkVersion"
+        implementation "org.apache.flink:flink-runtime:$flinkVersion"
 
         // test:junit
         testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"

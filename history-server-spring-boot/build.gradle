@@ -2,7 +2,4 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     compileOnlyApi 'org.springframework.boot:spring-boot-starter-data-jpa'
-
-    //flink
-    implementation "org.apache.flink:flink-core:$flinkVersion"
 }

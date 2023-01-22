@@ -20,25 +20,58 @@
 
 package com.fortycoderplus.flink.ext.historyserver.jpa;
 
+import com.fortycoderplus.flink.ext.historyserver.jpa.mapper.FlinkJobMapper;
 import com.fortycoderplus.flink.ext.historyserver.rest.FlinkRestApiService;
 import com.fortycoderplus.flink.ext.historyserver.rest.Job;
 import com.fortycoderplus.flink.ext.historyserver.rest.JobXJson;
 import com.fortycoderplus.flink.ext.historyserver.rest.Overview;
+import com.fortycoderplus.flink.ext.historyserver.rest.Overview.OverviewBuilder;
 import java.util.List;
+import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import org.apache.flink.runtime.util.EnvironmentInformation;
+import org.springframework.data.domain.Pageable;
 
+@AllArgsConstructor
 public class FlinkRestApiJpaService implements FlinkRestApiService {
+
+    private final FlinkJobRepository flinkJobRepository;
+    private final FlinkJobXJsonRepository flinkJobXJsonRepository;
+
     @Override
     public Overview overview() {
-        return null;
+        List<FlinkJobSummary> summaries = flinkJobRepository.findFlinkJobSummaryGroupByState();
+        OverviewBuilder builder = Overview.builder()
+                .flinkVersion(EnvironmentInformation.getVersion())
+                .flinkCommit(EnvironmentInformation.getGitCommitId())
+                .taskmanagers(0)
+                .slotsTotal(0)
+                .slotsAvailable(0);
+        summaries.forEach(summary -> {
+            switch (summary.getState()) {
+                case FAILED:
+                    builder.jobsFailed(summary.getCount());
+                case CANCELED:
+                    builder.jobsCancelled(summary.getCount());
+                case FINISHED:
+                    builder.jobsFinished(summary.getCount());
+                default:
+                    builder.jobsRunning(0);
+            }
+        });
+        return builder.build();
     }
 
     @Override
     public List<Job> latest(int n) {
-        return null;
+        return flinkJobRepository.find(Pageable.ofSize(n)).stream()
+                .map(FlinkJobMapper.INSTANCE::flinkJobToJob)
+                .collect(Collectors.toList());
     }
 
     @Override
     public JobXJson json(String jid, String path) {
-        return null;
+        FlinkJobXJson xJson = flinkJobXJsonRepository.findByJidAndPath(jid, path);
+        return JobXJson.builder().json(xJson.getJson()).build();
     }
 }

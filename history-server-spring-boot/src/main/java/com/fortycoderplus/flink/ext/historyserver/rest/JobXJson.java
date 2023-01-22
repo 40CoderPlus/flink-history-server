@@ -20,6 +20,9 @@
 
 package com.fortycoderplus.flink.ext.historyserver.rest;
 
+import lombok.Builder;
+
+@Builder
 public class JobXJson {
 
     String json;

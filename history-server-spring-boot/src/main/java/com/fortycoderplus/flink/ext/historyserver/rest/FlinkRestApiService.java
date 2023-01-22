@@ -20,12 +20,41 @@
 
 package com.fortycoderplus.flink.ext.historyserver.rest;
 
+import com.fortycoderplus.flink.ext.historyserver.rest.Config.Features;
+import java.time.ZonedDateTime;
 import java.util.List;
+import org.apache.flink.runtime.rest.messages.DashboardConfiguration;
 
 /**
  * Notice: just for Flink History Server Rest API
  */
 public interface FlinkRestApiService {
+
+    /**
+     * Flink Dashboard Config. Default Config is only enable history.
+     *
+     * @return Config
+     */
+    default Config config() {
+        return config(10000L);
+    }
+
+    default Config config(long refreshInterval) {
+        DashboardConfiguration configuration =
+                DashboardConfiguration.from(refreshInterval, ZonedDateTime.now(), false, false, true);
+        return Config.builder()
+                .refreshInterval(configuration.getRefreshInterval())
+                .flinkVersion(configuration.getFlinkVersion())
+                .flinkRevision(configuration.getFlinkRevision())
+                .timeZoneName(configuration.getTimeZoneName())
+                .timeZoneOffset(configuration.getTimeZoneOffset())
+                .features(Features.builder()
+                        .webCancelEnabled(configuration.getFeatures().isWebCancelEnabled())
+                        .webSubmitEnabled(configuration.getFeatures().isWebSubmitEnabled())
+                        .isHistoryServer(configuration.getFeatures().isHistoryServer())
+                        .build())
+                .build();
+    }
 
     /**
      * For Flink Rest Endpoint : /overview

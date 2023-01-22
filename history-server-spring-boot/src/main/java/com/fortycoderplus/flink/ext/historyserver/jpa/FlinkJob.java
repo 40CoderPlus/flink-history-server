@@ -20,9 +20,13 @@
 
 package com.fortycoderplus.flink.ext.historyserver.jpa;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fortycoderplus.flink.ext.historyserver.rest.JobState;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -55,8 +59,18 @@ public class FlinkJob extends AbstractPersistable<UUID> {
     private long endTime;
     private long duration;
     private long lastModification;
+
+    @JsonProperty("tasks")
     private FlinkTask task;
 
-    @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "job", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JsonIgnore
     private List<FlinkJobXJson> xJsons;
+
+    public void addJobXJson(FlinkJobXJson xJson) {
+        if (xJsons == null) {
+            xJsons = new ArrayList<>();
+        }
+        xJsons.add(xJson);
+    }
 }

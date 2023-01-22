@@ -18,23 +18,22 @@
  * limitations under the License.
  */
 
-package com.fortycoderplus.flink.ext.historyserver.jpa;
+package com.fortycoderplus.flink.ext.historyserver.jpa.mapper;
 
-import com.fortycoderplus.flink.ext.historyserver.rest.JobState;
+import com.fortycoderplus.flink.ext.historyserver.jpa.FlinkJob;
+import com.fortycoderplus.flink.ext.historyserver.rest.Job;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
-public interface FlinkJobSummary {
+@Mapper
+public interface FlinkJobMapper {
 
-    /**
-     * Flink Job State
-     *
-     * @return JobState
-     */
-    JobState getState();
+    FlinkJobMapper INSTANCE = Mappers.getMapper(FlinkJobMapper.class);
 
-    /**
-     * count group by state
-     *
-     * @return long
-     */
-    int getCount();
+    @Mapping(source = "task", target = "tasks")
+    Job flinkJobToJob(FlinkJob job);
+
+    @Mapping(source = "tasks", target = "task")
+    FlinkJob jobToFlinkJob(Job job);
 }

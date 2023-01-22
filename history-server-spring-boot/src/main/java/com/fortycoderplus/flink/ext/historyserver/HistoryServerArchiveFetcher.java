@@ -49,7 +49,7 @@ public class HistoryServerArchiveFetcher {
             .registerModule((new Jdk8Module()))
             .disable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    private static final Consumer<HistoryServerJobArchive> defaultConsumerAfterFetch =
+    public static final Consumer<HistoryServerJobArchive> defaultConsumerAfterFetch =
             HistoryServerArchiveFetcher::deleteArchive;
     private static final String ARCHIVE = "archive";
     private static final String PATH = "path";
@@ -171,10 +171,6 @@ public class HistoryServerArchiveFetcher {
         }
     }
 
-    private static void deleteArchive(HistoryServerJobArchive archive) {
-        deleteArchive(archive, true);
-    }
-
     private static void deleteArchive(HistoryServerJobArchive archive, boolean valid) {
         try {
             archive.getFs().delete(archive.getFileStatus().getPath(), false);
@@ -191,5 +187,9 @@ public class HistoryServerArchiveFetcher {
                         ex);
             }
         }
+    }
+
+    public static void deleteArchive(HistoryServerJobArchive archive) {
+        deleteArchive(archive, true);
     }
 }

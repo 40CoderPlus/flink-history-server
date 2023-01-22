@@ -20,35 +20,16 @@
 
 package com.fortycoderplus.flink.ext.historyserver.jpa;
 
+import java.util.List;
 import java.util.UUID;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Index;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.data.jpa.domain.AbstractPersistable;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-@Builder
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Entity
-@Table(
-        name = "flink_ext_job_json",
-        indexes = {@Index(columnList = "jid"), @Index(columnList = "path")})
-public class FlinkJobXJson extends AbstractPersistable<UUID> {
+public interface FlinkJobRepository extends PagingAndSortingRepository<FlinkJob, UUID> {
 
-    // redundancy filed for query json by jid and path
-    private String jid;
-    private String path;
-    private String json;
+    List<FlinkJob> find(Pageable pageable);
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private FlinkJob job;
+    @Query("select j.state as state ,count(j) as count from FlinkJob j group by j.state")
+    List<FlinkJobSummary> findFlinkJobSummaryGroupByState();
 }
