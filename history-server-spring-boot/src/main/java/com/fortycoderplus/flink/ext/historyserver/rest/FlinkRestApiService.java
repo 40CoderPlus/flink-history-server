@@ -20,7 +20,11 @@
 
 package com.fortycoderplus.flink.ext.historyserver.rest;
 
-import com.fortycoderplus.flink.ext.historyserver.rest.Config.Features;
+import com.fortycoderplus.flink.ext.historyserver.domain.Config;
+import com.fortycoderplus.flink.ext.historyserver.domain.Config.Features;
+import com.fortycoderplus.flink.ext.historyserver.domain.Job;
+import com.fortycoderplus.flink.ext.historyserver.domain.JobXJson;
+import com.fortycoderplus.flink.ext.historyserver.domain.Overview;
 import java.time.ZonedDateTime;
 import java.util.List;
 import org.apache.flink.runtime.rest.messages.DashboardConfiguration;

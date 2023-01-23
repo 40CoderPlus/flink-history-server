@@ -18,19 +18,26 @@
  * limitations under the License.
  */
 
-package com.fortycoderplus.flink.ext.historyserver.rest;
+package com.fortycoderplus.flink.ext.historyserver.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Builder
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Job {
 
     private String jid;
     private String name;
-    private String state;
+    private JobState state;
 
     @JsonProperty("start-time")
     private long startTime;
@@ -45,8 +52,13 @@ public class Job {
 
     private Tasks tasks;
 
+    private List<JobXJson> xJsons;
+
     @Builder
-    @Data
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Tasks {
         private int total;
         private int created;

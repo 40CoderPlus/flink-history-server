@@ -22,7 +22,8 @@ package com.fortycoderplus.flink.ext.historyserver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.File;
+import com.fortycoderplus.flink.ext.historyserver.domain.Job;
+import com.fortycoderplus.flink.ext.historyserver.domain.JobXJson;
 import java.util.List;
 import java.util.function.Consumer;
 import org.apache.flink.core.fs.FileSystem;
@@ -34,16 +35,12 @@ class HistoryServerArchiveFetcherTest {
     @Test
     void fetchArchives() {
         FileSystem fs = FileSystem.getLocalFileSystem();
-        Consumer<List<HistoryServerArchivedJson>> testConsumer = jsons -> assertEquals(
-                1L,
-                jsons.stream()
-                        .map(HistoryServerArchivedJson::getJobId)
-                        .distinct()
-                        .count());
+        Consumer<Job> testConsumer = job -> assertEquals(
+                1L, job.getXJsons().stream().map(JobXJson::getJid).distinct().count());
         HistoryServerArchiveFetcher fetcher = new HistoryServerArchiveFetcher(testConsumer, archive -> {});
         fetcher.fetchArchives(List.of(HistoryServerRefreshLocation.builder()
                 .fs(fs)
-                .path(Path.fromLocalFile(new File("data")))
+                .path(new Path(fs.getWorkingDirectory().getParent().getParent(), "data"))
                 .build()));
     }
 }

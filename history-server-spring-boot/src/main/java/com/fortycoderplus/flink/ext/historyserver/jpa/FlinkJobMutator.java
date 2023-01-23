@@ -20,42 +20,20 @@
 
 package com.fortycoderplus.flink.ext.historyserver.jpa;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fortycoderplus.flink.ext.historyserver.HistoryServerArchivedJson;
-import java.util.List;
+import com.fortycoderplus.flink.ext.historyserver.domain.Job;
+import com.fortycoderplus.flink.ext.historyserver.jpa.mapper.FlinkJobMapper;
+import com.fortycoderplus.flink.ext.historyserver.jpa.mapper.FlinkJobXJsonMapper;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class FlinkJobMutator implements Consumer<List<HistoryServerArchivedJson>> {
-
-    private static final String JOBS_OVERVIEW = "/jobs/overview";
-    private static final ObjectMapper mapper = new ObjectMapper();
-
+public class FlinkJobMutator implements Consumer<Job> {
     private final FlinkJobRepository flinkJobRepository;
 
     @Override
-    public void accept(List<HistoryServerArchivedJson> archivedJsons) {
-        FlinkJob flinkJob = archivedJsons.stream()
-                .filter(j -> j.getPath().equals(JOBS_OVERVIEW))
-                .findFirst()
-                .map(j -> {
-                    try {
-                        return mapper.readValue(j.getJson(), FlinkJob.class);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .orElseGet(() ->
-                        FlinkJob.builder().jid(archivedJsons.get(0).getJobId()).build());
-        archivedJsons.stream()
-                .filter(j -> !j.getPath().equals(JOBS_OVERVIEW))
-                .forEach(j -> flinkJob.addJobXJson(FlinkJobXJson.builder()
-                        .json(j.getJson())
-                        .path(j.getPath())
-                        .jid(j.getJobId())
-                        .build()));
-        flinkJobRepository.save(flinkJob);
+    public void accept(Job job) {
+        FlinkJob entity = FlinkJobMapper.INSTANCE.toJpaEntity(job);
+        job.getXJsons().stream().map(FlinkJobXJsonMapper.INSTANCE::toJpaEntity).forEach(entity::addJobXJson);
+        flinkJobRepository.save(entity);
     }
 }

@@ -20,12 +20,12 @@
 
 package com.fortycoderplus.flink.ext.historyserver.jpa;
 
+import com.fortycoderplus.flink.ext.historyserver.domain.Job;
+import com.fortycoderplus.flink.ext.historyserver.domain.JobXJson;
+import com.fortycoderplus.flink.ext.historyserver.domain.Overview;
+import com.fortycoderplus.flink.ext.historyserver.domain.Overview.OverviewBuilder;
 import com.fortycoderplus.flink.ext.historyserver.jpa.mapper.FlinkJobMapper;
 import com.fortycoderplus.flink.ext.historyserver.rest.FlinkRestApiService;
-import com.fortycoderplus.flink.ext.historyserver.rest.Job;
-import com.fortycoderplus.flink.ext.historyserver.rest.JobXJson;
-import com.fortycoderplus.flink.ext.historyserver.rest.Overview;
-import com.fortycoderplus.flink.ext.historyserver.rest.Overview.OverviewBuilder;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -65,7 +65,7 @@ public class FlinkRestApiJpaService implements FlinkRestApiService {
     @Override
     public List<Job> latest(int n) {
         return flinkJobRepository.find(Pageable.ofSize(n)).stream()
-                .map(FlinkJobMapper.INSTANCE::flinkJobToJob)
+                .map(FlinkJobMapper.INSTANCE::fromJpaEntity)
                 .collect(Collectors.toList());
     }
 

@@ -20,20 +20,21 @@
 
 package com.fortycoderplus.flink.ext.historyserver.jpa.mapper;
 
+import com.fortycoderplus.flink.ext.historyserver.domain.Job;
 import com.fortycoderplus.flink.ext.historyserver.jpa.FlinkJob;
-import com.fortycoderplus.flink.ext.historyserver.rest.Job;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface FlinkJobMapper {
 
     FlinkJobMapper INSTANCE = Mappers.getMapper(FlinkJobMapper.class);
 
     @Mapping(source = "task", target = "tasks")
-    Job flinkJobToJob(FlinkJob job);
+    Job fromJpaEntity(FlinkJob job);
 
     @Mapping(source = "tasks", target = "task")
-    FlinkJob jobToFlinkJob(Job job);
+    FlinkJob toJpaEntity(Job job);
 }

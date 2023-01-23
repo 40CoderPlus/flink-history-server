@@ -20,11 +20,14 @@
 
 package com.fortycoderplus.flink.ext.historyserver;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fortycoderplus.flink.ext.historyserver.domain.Job;
+import com.fortycoderplus.flink.ext.historyserver.domain.JobXJson;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -51,22 +54,23 @@ public class HistoryServerArchiveFetcher {
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     public static final Consumer<HistoryServerJobArchive> defaultConsumerAfterFetch =
             HistoryServerArchiveFetcher::deleteArchive;
+
+    private static final String JOBS_OVERVIEW = "/jobs/overview";
     private static final String ARCHIVE = "archive";
     private static final String PATH = "path";
     private static final String JSON = "json";
 
-    private final Consumer<List<HistoryServerArchivedJson>> archivedJsonConsumer;
+    private final Consumer<Job> archivedJobConsumer;
     private final Consumer<HistoryServerJobArchive> consumerAfterFetch;
 
-    public HistoryServerArchiveFetcher(Consumer<List<HistoryServerArchivedJson>> archivedJsonConsumer) {
-        this.archivedJsonConsumer = archivedJsonConsumer;
+    public HistoryServerArchiveFetcher(Consumer<Job> archivedJobConsumer) {
+        this.archivedJobConsumer = archivedJobConsumer;
         consumerAfterFetch = defaultConsumerAfterFetch;
     }
 
     public HistoryServerArchiveFetcher(
-            Consumer<List<HistoryServerArchivedJson>> archivedJsonConsumer,
-            Consumer<HistoryServerJobArchive> consumerAfterFetch) {
-        this.archivedJsonConsumer = archivedJsonConsumer;
+            Consumer<Job> archivedJobConsumer, Consumer<HistoryServerJobArchive> consumerAfterFetch) {
+        this.archivedJobConsumer = archivedJobConsumer;
         this.consumerAfterFetch = consumerAfterFetch;
     }
 
@@ -94,7 +98,7 @@ public class HistoryServerArchiveFetcher {
                     } else {
                         logger.info("Processing archive {}.", jobArchivePath);
                         try {
-                            archivedJsonConsumer.accept(getArchivedJsons(jobID, jobArchivePath));
+                            archivedJobConsumer.accept(getArchivedJob(jobID, jobArchivePath));
                         } catch (IOException ignore) {
                         } catch (Exception ex) {
                             logger.error("Consume archived jsons from path {} failed.", jobArchivePath, ex);
@@ -139,21 +143,21 @@ public class HistoryServerArchiveFetcher {
     }
 
     /**
-     * Reads the given archive file and returns a {@link List} of contained {@link
-     * HistoryServerArchivedJson}.
+     * Reads the given archive file and returns a {@link Job}.
      *
      * @param file archive to extract
-     * @return collection of archived jsons
+     * @return Job an archived job
      * @throws IOException if the file can't be opened, read or doesn't contain valid json
      */
-    private static List<HistoryServerArchivedJson> getArchivedJsons(String jobId, Path file) throws IOException {
+    private static Job getArchivedJob(String jobId, Path file) throws IOException {
         try (FSDataInputStream input = file.getFileSystem().open(file);
                 ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             IOUtils.copyBytes(input, output);
 
             try {
                 JsonNode archive = mapper.readTree(output.toByteArray());
-                return StreamSupport.stream(archive.get(ARCHIVE).spliterator(), false)
+                List<HistoryServerArchivedJson> archivedJsons = StreamSupport.stream(
+                                archive.get(ARCHIVE).spliterator(), false)
                         .map(part -> {
                             String path = part.get(PATH).asText();
                             String json = part.get(JSON).asText();
@@ -164,6 +168,28 @@ public class HistoryServerArchiveFetcher {
                                     .build();
                         })
                         .collect(Collectors.toList());
+                Job job = archivedJsons.stream()
+                        .filter(archiveJson -> archiveJson.getPath().equals(JOBS_OVERVIEW))
+                        .findAny()
+                        .map(archiveJson -> {
+                            try {
+                                JsonNode overview =
+                                        mapper.readTree(archiveJson.getJson()).get("jobs");
+                                return mapper.convertValue(overview.get(0), Job.class);
+                            } catch (JsonProcessingException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        })
+                        .orElseThrow(() -> new IllegalArgumentException("Job overview not found"));
+                job.setXJsons(archivedJsons.stream()
+                        .filter(j -> !j.getPath().equals(JOBS_OVERVIEW))
+                        .map(j -> JobXJson.builder()
+                                .json(j.getJson())
+                                .path(j.getPath())
+                                .jid(j.getJobId())
+                                .build())
+                        .collect(Collectors.toList()));
+                return job;
             } catch (NullPointerException npe) {
                 // occurs if the archive is empty or any of the expected fields are not present
                 throw new IOException("Job archive (" + file.getPath() + ") did not conform to expected format.");

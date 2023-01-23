@@ -18,12 +18,21 @@
  * limitations under the License.
  */
 
-package com.fortycoderplus.flink.ext.historyserver.rest;
+package com.fortycoderplus.flink.ext.historyserver.domain;
 
-import lombok.Builder;
+import java.util.Arrays;
 
-@Builder
-public class JobXJson {
+public enum JobState {
+    RUNNING,
+    CANCELED,
+    FAILED,
 
-    String json;
+    FINISHED;
+
+    public static JobState from(String state) {
+        return Arrays.stream(JobState.values())
+                .filter(s -> s.name().equalsIgnoreCase(state))
+                .findAny()
+                .orElse(FINISHED);
+    }
 }

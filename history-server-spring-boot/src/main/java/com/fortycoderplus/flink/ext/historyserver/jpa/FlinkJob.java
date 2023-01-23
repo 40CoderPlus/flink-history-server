@@ -22,7 +22,7 @@ package com.fortycoderplus.flink.ext.historyserver.jpa;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fortycoderplus.flink.ext.historyserver.rest.JobState;
+import com.fortycoderplus.flink.ext.historyserver.domain.JobState;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

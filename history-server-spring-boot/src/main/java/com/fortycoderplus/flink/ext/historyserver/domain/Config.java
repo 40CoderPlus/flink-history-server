@@ -18,31 +18,46 @@
  * limitations under the License.
  */
 
-package com.fortycoderplus.flink.ext.historyserver.jpa;
+package com.fortycoderplus.flink.ext.historyserver.domain;
 
-import javax.persistence.Embeddable;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 @Builder
-@Getter
-@Setter
-@NoArgsConstructor
 @AllArgsConstructor
-@Embeddable
-public class FlinkTask {
-    private int total;
-    private int created;
-    private int scheduled;
-    private int deploying;
-    private int running;
-    private int finished;
-    private int canceling;
-    private int canceled;
-    private int failed;
-    private int reconciling;
-    private int initializing;
+@Data
+public class Config {
+    @JsonProperty("refresh-interval")
+    private final long refreshInterval;
+
+    @JsonProperty("timezone-name")
+    private final String timeZoneName;
+
+    @JsonProperty("timezone-offset")
+    private final int timeZoneOffset;
+
+    @JsonProperty("flink-version")
+    private final String flinkVersion;
+
+    @JsonProperty("flink-revision")
+    private final String flinkRevision;
+
+    @JsonProperty("features")
+    private final Features features;
+
+    @Builder
+    @AllArgsConstructor
+    @Data
+    public static class Features {
+        @JsonProperty("web-submit")
+        private final boolean webSubmitEnabled;
+
+        @JsonProperty("web-cancel")
+        private final boolean webCancelEnabled;
+
+        @JsonProperty("web-history")
+        private final boolean isHistoryServer;
+    }
 }

@@ -18,21 +18,20 @@
  * limitations under the License.
  */
 
-package com.fortycoderplus.flink.ext.historyserver.rest;
+package com.fortycoderplus.flink.ext.historyserver.jpa.mapper;
 
-import java.util.Arrays;
+import com.fortycoderplus.flink.ext.historyserver.domain.JobXJson;
+import com.fortycoderplus.flink.ext.historyserver.jpa.FlinkJobXJson;
+import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
+import org.mapstruct.factory.Mappers;
 
-public enum JobState {
-    RUNNING,
-    CANCELED,
-    FAILED,
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface FlinkJobXJsonMapper {
 
-    FINISHED;
+    FlinkJobXJsonMapper INSTANCE = Mappers.getMapper(FlinkJobXJsonMapper.class);
 
-    public static JobState from(String state) {
-        return Arrays.stream(JobState.values())
-                .filter(s -> s.name().equalsIgnoreCase(state))
-                .findAny()
-                .orElse(FINISHED);
-    }
+    JobXJson fromJpaEntity(FlinkJobXJson xJson);
+
+    FlinkJobXJson toJpaEntity(JobXJson xJson);
 }

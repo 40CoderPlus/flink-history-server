@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-package com.fortycoderplus.flink.ext.historyserver.rest;
+package com.fortycoderplus.flink.ext.historyserver.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
