@@ -21,7 +21,6 @@
 package com.fortycoderplus.flink.ext.historyserver.jpa;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fortycoderplus.flink.ext.historyserver.domain.JobState;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +59,6 @@ public class FlinkJob extends AbstractPersistable<UUID> {
     private long duration;
     private long lastModification;
 
-    @JsonProperty("tasks")
     private FlinkTask task;
 
     @OneToMany(mappedBy = "job", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)

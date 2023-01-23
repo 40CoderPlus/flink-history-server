@@ -20,10 +20,11 @@
 
 package com.fortycoderplus.flink.ext.historyserver.jpa;
 
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface FlinkJobXJsonRepository extends PagingAndSortingRepository<FlinkJobXJson, UUID> {
 
-    FlinkJobXJson findByJidAndPath(String jid, String path);
+    Optional<FlinkJobXJson> findByJidAndPath(String jid, String path);
 }

@@ -20,16 +20,7 @@
 
 package com.fortycoderplus.flink.ext.historyserver.jpa;
 
-import java.util.List;
-import java.util.UUID;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.boot.SpringBootConfiguration;
 
-public interface FlinkJobRepository extends PagingAndSortingRepository<FlinkJob, UUID> {
-
-    List<FlinkJob> findBy(Pageable pageable);
-
-    @Query("select j.state as state ,count(j) as count from FlinkJob j group by j.state")
-    List<FlinkJobSummary> findFlinkJobSummaryGroupByState();
-}
+@SpringBootConfiguration
+public class TestConfig {}

@@ -27,10 +27,13 @@ import com.fortycoderplus.flink.ext.historyserver.domain.Overview.OverviewBuilde
 import com.fortycoderplus.flink.ext.historyserver.jpa.mapper.FlinkJobMapper;
 import com.fortycoderplus.flink.ext.historyserver.rest.FlinkRestApiService;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.apache.flink.runtime.util.EnvironmentInformation;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 
 @AllArgsConstructor
 public class FlinkRestApiJpaService implements FlinkRestApiService {
@@ -64,14 +67,16 @@ public class FlinkRestApiJpaService implements FlinkRestApiService {
 
     @Override
     public List<Job> latest(int n) {
-        return flinkJobRepository.find(Pageable.ofSize(n)).stream()
+        return flinkJobRepository.findBy(PageRequest.of(0, n, Sort.by(Direction.DESC, "endTime"))).stream()
                 .map(FlinkJobMapper.INSTANCE::fromJpaEntity)
                 .collect(Collectors.toList());
     }
 
     @Override
     public JobXJson json(String jid, String path) {
-        FlinkJobXJson xJson = flinkJobXJsonRepository.findByJidAndPath(jid, path);
-        return JobXJson.builder().json(xJson.getJson()).build();
+        Optional<FlinkJobXJson> xJson = flinkJobXJsonRepository.findByJidAndPath(jid, path);
+        return JobXJson.builder()
+                .json(xJson.map(FlinkJobXJson::getJson).orElse("{}"))
+                .build();
     }
 }

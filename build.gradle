@@ -70,6 +70,8 @@ subprojects {
         // test:junit
         testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
         testImplementation "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+        // test:springboot
+        testImplementation('org.springframework.boot:spring-boot-starter-test')
     }
 
     plugins.withType(JavaPlugin) {

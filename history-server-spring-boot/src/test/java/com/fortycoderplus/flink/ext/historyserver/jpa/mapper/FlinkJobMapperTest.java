@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 class FlinkJobMapperTest {
 
     @Test
-    void flinkJobToJob() {
+    void fromJpaEntity() {
         long now = System.currentTimeMillis();
         FlinkJob source = FlinkJob.builder()
                 .jid("1")
@@ -64,7 +64,7 @@ class FlinkJobMapperTest {
     }
 
     @Test
-    void jobToFlinkJob() {
+    void toJpaEntity() {
         long now = System.currentTimeMillis();
         Job source = Job.builder()
                 .jid("1")

@@ -27,13 +27,19 @@ import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class FlinkJobMutator implements Consumer<Job> {
+public class FlinkJobJpaMutator implements Consumer<Job> {
     private final FlinkJobRepository flinkJobRepository;
 
     @Override
     public void accept(Job job) {
         FlinkJob entity = FlinkJobMapper.INSTANCE.toJpaEntity(job);
-        job.getXJsons().stream().map(FlinkJobXJsonMapper.INSTANCE::toJpaEntity).forEach(entity::addJobXJson);
+        job.getXJsons().stream()
+                .map(xJson -> {
+                    FlinkJobXJson result = FlinkJobXJsonMapper.INSTANCE.toJpaEntity(xJson);
+                    result.setJob(entity);
+                    return result;
+                })
+                .forEach(entity::addJobXJson);
         flinkJobRepository.save(entity);
     }
 }
