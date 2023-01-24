@@ -70,6 +70,15 @@ public interface FlinkRestApiService {
     /**
      * For Flink Rest Endpoint : /jobs/overview
      * Order by job end time
+     * @return List<Job>
+     */
+    default List<Job> latest() {
+        return latest(50);
+    }
+
+    /**
+     * For Flink Rest Endpoint : /jobs/overview
+     * Order by job end time
      * @param n number of page size.
      * @return List<Job>
      */

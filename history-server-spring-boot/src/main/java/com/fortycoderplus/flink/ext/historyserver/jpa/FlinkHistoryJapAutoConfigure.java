@@ -18,31 +18,36 @@
  * limitations under the License.
  */
 
-package com.fortycoderplus.flink.ext.historyserver;
+package com.fortycoderplus.flink.ext.historyserver.jpa;
 
 import com.fortycoderplus.flink.ext.historyserver.domain.Job;
+import com.fortycoderplus.flink.ext.historyserver.rest.FlinkRestApiService;
 import java.util.function.Consumer;
-import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.jpa.support.ClasspathScanningPersistenceUnitPostProcessor;
 
 @Configuration
-@EnableConfigurationProperties(HistoryServerProperties.class)
-public class HistoryServerAutoConfigure {
+@ConditionalOnClass(ClasspathScanningPersistenceUnitPostProcessor.class)
+@EnableJpaRepositories(basePackages = "com.fortycoderplus.flink.ext.historyserver.jpa")
+@EntityScan(basePackages = "com.fortycoderplus.flink.ext.historyserver.jpa")
+public class FlinkHistoryJapAutoConfigure {
 
     @Bean("archivedJobConsumer")
-    @Order(2)
+    @Order(1)
     @ConditionalOnMissingBean
-    public Consumer<Job> archivedJobConsumer() {
-        return archivedJson ->
-                LoggerFactory.getLogger("ArchivedJsonConsumer").info("Processing archived json {}.", archivedJson);
+    public Consumer<Job> archivedJobConsumer(FlinkJobRepository flinkJobRepository) {
+        return new FlinkJobJpaMutator(flinkJobRepository);
     }
 
     @Bean
-    public HistoryServerArchiveFetcher historyServerArchiveFetcher(Consumer<Job> archivedJobConsumer) {
-        return new HistoryServerArchiveFetcher(archivedJobConsumer);
+    public FlinkRestApiService flinkRestApiService(
+            FlinkJobRepository flinkJobRepository, FlinkJobXJsonRepository flinkJobXJsonRepository) {
+        return new FlinkRestApiJpaService(flinkJobRepository, flinkJobXJsonRepository);
     }
 }
