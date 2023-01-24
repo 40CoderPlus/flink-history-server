@@ -20,6 +20,7 @@
 
 package com.fortycoderplus.flink.ext.historyserver.jpa;
 
+import com.fortycoderplus.flink.ext.historyserver.HistoryServerProperties;
 import com.fortycoderplus.flink.ext.historyserver.domain.Job;
 import com.fortycoderplus.flink.ext.historyserver.rest.FlinkRestApiService;
 import java.util.function.Consumer;
@@ -45,7 +46,9 @@ public class FlinkHistoryJpaAutoConfigure {
 
     @Bean
     public FlinkRestApiService flinkRestApiService(
-            FlinkJobRepository flinkJobRepository, FlinkJobXJsonRepository flinkJobXJsonRepository) {
-        return new FlinkRestApiJpaService(flinkJobRepository, flinkJobXJsonRepository);
+            HistoryServerProperties historyServerProperties,
+            FlinkJobRepository flinkJobRepository,
+            FlinkJobXJsonRepository flinkJobXJsonRepository) {
+        return new FlinkRestApiJpaService(historyServerProperties, flinkJobRepository, flinkJobXJsonRepository);
     }
 }

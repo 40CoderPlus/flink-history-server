@@ -78,10 +78,10 @@ public interface FlinkRestApiService {
     /**
      * For Flink Rest Endpoint : /jobs/overview
      * Order by job end time
-     * @param n number of page size.
+     * @param size number of page size.
      * @return List<Job>
      */
-    JobsOverview latest(int n);
+    JobsOverview latest(int size);
 
     /**
      * For Flink Rest Endpoint : /jobs/{id}/**
