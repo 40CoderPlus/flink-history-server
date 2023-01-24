@@ -23,6 +23,7 @@ package com.fortycoderplus.flink.ext.historyserver.jpa;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fortycoderplus.flink.ext.historyserver.HistoryServerProperties;
 import com.fortycoderplus.flink.ext.historyserver.domain.Job;
 import com.fortycoderplus.flink.ext.historyserver.domain.Overview;
 import java.util.List;
@@ -88,7 +89,8 @@ class FlinkRestApiJpaServiceTest extends BaseTest {
 
     @BeforeEach
     void setUp() {
-        flinkRestApiJpaService = new FlinkRestApiJpaService(flinkJobRepository, flinkJobXJsonRepository);
+        flinkRestApiJpaService =
+                new FlinkRestApiJpaService(new HistoryServerProperties(), flinkJobRepository, flinkJobXJsonRepository);
         flinkJobJpaMutator = new FlinkJobJpaMutator(flinkJobRepository);
         jobs.forEach(flinkJobJpaMutator);
     }
