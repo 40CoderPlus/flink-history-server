@@ -20,8 +20,8 @@
 
 package com.fortycoderplus.flink.ext.historyserver.jpa;
 
-import com.fortycoderplus.flink.ext.historyserver.domain.Job;
 import com.fortycoderplus.flink.ext.historyserver.domain.JobXJson;
+import com.fortycoderplus.flink.ext.historyserver.domain.JobsOverview;
 import com.fortycoderplus.flink.ext.historyserver.domain.Overview;
 import com.fortycoderplus.flink.ext.historyserver.domain.Overview.OverviewBuilder;
 import com.fortycoderplus.flink.ext.historyserver.jpa.mapper.FlinkJobMapper;
@@ -66,10 +66,12 @@ public class FlinkRestApiJpaService implements FlinkRestApiService {
     }
 
     @Override
-    public List<Job> latest(int n) {
-        return flinkJobRepository.findBy(PageRequest.of(0, n, Sort.by(Direction.DESC, "endTime"))).stream()
-                .map(FlinkJobMapper.INSTANCE::fromJpaEntity)
-                .collect(Collectors.toList());
+    public JobsOverview latest(int n) {
+        return JobsOverview.builder()
+                .jobs(flinkJobRepository.findBy(PageRequest.of(0, n, Sort.by(Direction.DESC, "endTime"))).stream()
+                        .map(FlinkJobMapper.INSTANCE::fromJpaEntity)
+                        .collect(Collectors.toList()))
+                .build();
     }
 
     @Override

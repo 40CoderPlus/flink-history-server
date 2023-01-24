@@ -64,9 +64,9 @@ class FlinkRestApiJpaServiceTest extends BaseTest {
 
     @Test
     void latest() {
-        List<Job> top1 = flinkRestApiJpaService.latest(1);
-        List<Job> top2 = flinkRestApiJpaService.latest(2);
-        List<Job> top3 = flinkRestApiJpaService.latest(3);
+        List<Job> top1 = flinkRestApiJpaService.latest(1).getJobs();
+        List<Job> top2 = flinkRestApiJpaService.latest(2).getJobs();
+        List<Job> top3 = flinkRestApiJpaService.latest(3).getJobs();
 
         assertEquals(1L, top1.size());
         assertEquals("3", top1.get(0).getJid());

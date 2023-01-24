@@ -21,14 +21,11 @@
 package com.fortycoderplus.flink.ext.historyserver.embedded.interfaces;
 
 import com.fortycoderplus.flink.ext.historyserver.domain.Config;
-import com.fortycoderplus.flink.ext.historyserver.domain.Job;
 import com.fortycoderplus.flink.ext.historyserver.domain.JobXJson;
+import com.fortycoderplus.flink.ext.historyserver.domain.JobsOverview;
 import com.fortycoderplus.flink.ext.historyserver.domain.Overview;
 import com.fortycoderplus.flink.ext.historyserver.rest.FlinkRestApiService;
-import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,19 +51,13 @@ public class FlinkRestEndpoint {
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/jobs/overview")
-    public Jobs jobsOverview() {
-        return Jobs.builder().jobs(flinkRestApiService.latest()).build();
+    public JobsOverview jobsOverview() {
+        return flinkRestApiService.latest();
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/jobs/{jid}/**")
     public JobXJson path(@PathVariable String jid) {
         return flinkRestApiService.json(
                 jid, ServletUriComponentsBuilder.fromCurrentRequest().build().getPath());
-    }
-
-    @Builder
-    @Data
-    public static class Jobs {
-        private List<Job> jobs;
     }
 }

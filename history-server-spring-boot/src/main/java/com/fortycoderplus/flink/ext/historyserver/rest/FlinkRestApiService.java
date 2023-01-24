@@ -22,11 +22,10 @@ package com.fortycoderplus.flink.ext.historyserver.rest;
 
 import com.fortycoderplus.flink.ext.historyserver.domain.Config;
 import com.fortycoderplus.flink.ext.historyserver.domain.Config.Features;
-import com.fortycoderplus.flink.ext.historyserver.domain.Job;
 import com.fortycoderplus.flink.ext.historyserver.domain.JobXJson;
+import com.fortycoderplus.flink.ext.historyserver.domain.JobsOverview;
 import com.fortycoderplus.flink.ext.historyserver.domain.Overview;
 import java.time.ZonedDateTime;
-import java.util.List;
 import org.apache.flink.runtime.rest.messages.DashboardConfiguration;
 
 /**
@@ -72,7 +71,7 @@ public interface FlinkRestApiService {
      * Order by job end time
      * @return List<Job>
      */
-    default List<Job> latest() {
+    default JobsOverview latest() {
         return latest(50);
     }
 
@@ -82,7 +81,7 @@ public interface FlinkRestApiService {
      * @param n number of page size.
      * @return List<Job>
      */
-    List<Job> latest(int n);
+    JobsOverview latest(int n);
 
     /**
      * For Flink Rest Endpoint : /jobs/{id}/**
