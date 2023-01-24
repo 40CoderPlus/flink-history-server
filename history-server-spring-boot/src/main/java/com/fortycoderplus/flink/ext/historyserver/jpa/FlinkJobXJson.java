@@ -21,6 +21,7 @@
 package com.fortycoderplus.flink.ext.historyserver.jpa;
 
 import java.util.UUID;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
@@ -47,6 +48,8 @@ public class FlinkJobXJson extends AbstractPersistable<UUID> {
     // redundancy filed for query json by jid and path
     private String jid;
     private String path;
+
+    @Column(columnDefinition = "TEXT")
     private String json;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,0 +1,5 @@
+history:
+  server:
+    dashboard:
+      page-size: 50
+      refresh-interval: 10000

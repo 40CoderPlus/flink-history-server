@@ -21,24 +21,25 @@
 package com.fortycoderplus.flink.ext.historyserver;
 
 import com.fortycoderplus.flink.ext.historyserver.domain.Job;
+import com.fortycoderplus.flink.ext.historyserver.jpa.FlinkHistoryJpaAutoConfigure;
 import java.util.function.Consumer;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 
 @Configuration
+@AutoConfigureAfter(FlinkHistoryJpaAutoConfigure.class)
 @EnableConfigurationProperties(HistoryServerProperties.class)
 public class HistoryServerAutoConfigure {
 
     @Bean("archivedJobConsumer")
-    @Order(2)
     @ConditionalOnMissingBean
     public Consumer<Job> archivedJobConsumer() {
-        return archivedJson ->
-                LoggerFactory.getLogger("ArchivedJsonConsumer").info("Processing archived json {}.", archivedJson);
+        return archivedJob ->
+                LoggerFactory.getLogger("ArchivedJsonConsumer").info("Processing archived json {}.", archivedJob);
     }
 
     @Bean

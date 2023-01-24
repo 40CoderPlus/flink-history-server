@@ -21,7 +21,6 @@
 package com.fortycoderplus.flink.ext.historyserver.embedded.interfaces;
 
 import com.fortycoderplus.flink.ext.historyserver.domain.Config;
-import com.fortycoderplus.flink.ext.historyserver.domain.JobXJson;
 import com.fortycoderplus.flink.ext.historyserver.domain.JobsOverview;
 import com.fortycoderplus.flink.ext.historyserver.domain.Overview;
 import com.fortycoderplus.flink.ext.historyserver.rest.FlinkRestApiService;
@@ -56,8 +55,11 @@ public class FlinkRestEndpoint {
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/jobs/{jid}/**")
-    public JobXJson path(@PathVariable String jid) {
-        return flinkRestApiService.json(
-                jid, ServletUriComponentsBuilder.fromCurrentRequest().build().getPath());
+    public String path(@PathVariable String jid) {
+        return flinkRestApiService
+                .json(
+                        jid,
+                        ServletUriComponentsBuilder.fromCurrentRequest().build().getPath())
+                .getJson();
     }
 }

@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: flink-history-server-embedded-dashboard
+  profiles:
+    active: dev
