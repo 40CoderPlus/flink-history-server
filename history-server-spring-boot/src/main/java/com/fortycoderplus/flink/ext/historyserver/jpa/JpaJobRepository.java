@@ -28,6 +28,8 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface JpaJobRepository extends PagingAndSortingRepository<JpaJob, UUID> {
 
+    boolean existsByJid(String jid);
+
     List<JpaJob> findBy(Pageable pageable);
 
     @Query("select j.state as state ,count(j) as count from JpaJob j group by j.state")

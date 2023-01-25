@@ -32,14 +32,16 @@ public class FlinkJobJpaMutator implements Consumer<Job> {
 
     @Override
     public void accept(Job job) {
-        JpaJob entity = JobMapper.INSTANCE.toJpaEntity(job);
-        job.getXJsons().stream()
-                .map(xJson -> {
-                    JpaJobXJson result = JobXJsonMapper.INSTANCE.toJpaEntity(xJson);
-                    result.setJob(entity);
-                    return result;
-                })
-                .forEach(entity::addJobXJson);
-        jobRepository.save(entity);
+        if (!jobRepository.existsByJid(job.getJid())) {
+            JpaJob entity = JobMapper.INSTANCE.toJpaEntity(job);
+            job.getXJsons().stream()
+                    .map(xJson -> {
+                        JpaJobXJson result = JobXJsonMapper.INSTANCE.toJpaEntity(xJson);
+                        result.setJob(entity);
+                        return result;
+                    })
+                    .forEach(entity::addJobXJson);
+            jobRepository.save(entity);
+        }
     }
 }
