@@ -1,60 +1,32 @@
-# Gradle Single Module Template
+# Goal
 
-Using plugin
-- [Baseline](https://github.com/palantir/gradle-baseline)
-- [Spotless](https://github.com/diffplug/spotless)
-- [Sonar](https://github.com/SonarSource/sonar-scanner-gradle)
-- [Dependency Check](https://github.com/dependency-check/dependency-check-gradle)
+This project is an extension of [Flink History Server](https://nightlies.apache.org/flink/flink-docs-release-1.16/docs/deployment/advanced/historyserver/).
 
-# Baseline
+- history-server-spring-boot: a Spring Boot starter. Fetch Flink Job History from different FileSystem(s) and paths. After fetch job archived json, store then to db using JPA.
+- history-server-embedded-dashboard: embedded `Flink History Server` web dashboard, provide REST Endpoint
+  - /config
+  - /overview
+  - /jobs/overview
+  - /jobs/{jid}/**
 
-```shell
-gradle idea
-```
+Base on the tow module, we can fetch job history, store then to db, view then in web dashboard.
 
-# Build
+# Custom
 
-```shell
-gradle build -x test
-```
+- `Consumer<Job> archivedJobConsumer`: default is `FlinkJobJpaMutator`.
+  - EG: using Event-Driven pattern. publish to Spring events , using `ApplicationListener` to do some logic.
+- `HistoryServerArchiveFetcher`: custom `Consumer<Job>` `Consumer<HistoryServerJobArchive>`.
+  - default `Consumer<HistoryServerJobArchive>` is delete after file fetched.
+- `FlinkRestApiService`: default is `FlinkRestApiJpaService`.
 
-# Dependency Check
+# Scheduling
 
-Execute dependency check:
+Start a scheduled task to fetch archived jobs.
 
-```shell
-gradle dependencyCheckAggregate
-```
-
-# Spotless
-
-```shell
-gradle spotlessApply
-```
-
-# Sonar
-
-Configuration：
-
-add `gradle.properties` in folder `GRADLE_USER_HOME`
-
-add content:
-
-```text
-nexusUsername=foo
-nexusPassword=bar
-
-systemProp.sonar.host.url=http://sonarqube.40coderplus.com
-systemProp.sonar.login=keyForSonarqube
-```
-
-Execute sonar check:
-```shell
-gradle sonar
-```
-
-# Publish to Maven
-
-```shell
-gradle publish
+```java
+@Scheduled(fixedDelay = 10000, initialDelay = 5000)
+public void fetchInterval() {
+    logger.info("Schedule check history archive paths at {}", LocalDateTime.now());
+    historyServerArchiveFetcher.fetchArchives(refreshDirs);
+}
 ```
