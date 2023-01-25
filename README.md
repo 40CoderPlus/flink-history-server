@@ -30,3 +30,33 @@ public void fetchInterval() {
     historyServerArchiveFetcher.fetchArchives(refreshDirs);
 }
 ```
+
+# Filesystem
+
+Filesystem initialize example:
+
+```java
+FileSystem.initialize(configuration, null);
+FileSystem fileSystem = FileSystem.get(uri);
+```
+
+Filesystem configuration example:
+```json
+{
+  "s3.bucket": "fortycoderplus",
+  "s3.endpoint": "s3.40coderplus.com",
+  "s3.access.key": "ak",
+  "s3.secret.key": "sk",
+  "s3.connection.ssl.enabled": "false",
+  "s3.path.style.access": "true"
+  }
+```
+
+Build `HistoryServerRefreshLocation` example:
+
+```json
+HistoryServerRefreshLocation.builder()
+    .fs(FileSystem.getLocalFileSystem())
+    .path(new Path("data"))
+    .build()
+```
