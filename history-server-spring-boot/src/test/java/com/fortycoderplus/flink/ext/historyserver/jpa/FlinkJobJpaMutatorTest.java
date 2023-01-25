@@ -43,30 +43,28 @@ class FlinkJobJpaMutatorTest extends BaseTest {
     FlinkJobJpaMutator flinkJobJpaMutator;
 
     @Resource
-    FlinkJobRepository flinkJobRepository;
+    JpaJobRepository jobRepository;
 
     @Resource
-    FlinkJobXJsonRepository flinkJobXJsonRepository;
+    JobXJsonRepository jobXJsonRepository;
 
     @Test
     void accept() {
         jobs.forEach(flinkJobJpaMutator);
-        assertEquals(3L, flinkJobRepository.count());
-        flinkJobRepository
-                .findAll()
-                .forEach(job -> assertEquals(1L, job.getXJsons().size()));
+        assertEquals(3L, jobRepository.count());
+        jobRepository.findAll().forEach(job -> assertEquals(1L, job.getXJsons().size()));
         assertEquals(
                 "{'foo':'bar'}",
-                flinkJobXJsonRepository.findByJidAndPath("1", "test").get().getJson());
+                jobXJsonRepository.findByJidAndPath("1", "test").get().getJson());
     }
 
     @BeforeEach
     void setUp() {
-        flinkJobJpaMutator = new FlinkJobJpaMutator(flinkJobRepository);
+        flinkJobJpaMutator = new FlinkJobJpaMutator(jobRepository);
     }
 
     @AfterEach
     void tearDown() {
-        flinkJobRepository.deleteAll();
+        jobRepository.deleteAll();
     }
 }

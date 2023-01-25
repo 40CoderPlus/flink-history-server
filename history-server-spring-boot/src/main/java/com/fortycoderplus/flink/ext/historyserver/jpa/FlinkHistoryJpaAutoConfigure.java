@@ -40,15 +40,15 @@ public class FlinkHistoryJpaAutoConfigure {
 
     @Bean("archivedJobConsumer")
     @ConditionalOnMissingBean
-    public Consumer<Job> archivedJobConsumer(FlinkJobRepository flinkJobRepository) {
-        return new FlinkJobJpaMutator(flinkJobRepository);
+    public Consumer<Job> archivedJobConsumer(JpaJobRepository jobRepository) {
+        return new FlinkJobJpaMutator(jobRepository);
     }
 
     @Bean
     public FlinkRestApiService flinkRestApiService(
             HistoryServerProperties historyServerProperties,
-            FlinkJobRepository flinkJobRepository,
-            FlinkJobXJsonRepository flinkJobXJsonRepository) {
-        return new FlinkRestApiJpaService(historyServerProperties, flinkJobRepository, flinkJobXJsonRepository);
+            JpaJobRepository jobRepository,
+            JobXJsonRepository jobXJsonRepository) {
+        return new FlinkRestApiJpaService(historyServerProperties, jobRepository, jobXJsonRepository);
     }
 }

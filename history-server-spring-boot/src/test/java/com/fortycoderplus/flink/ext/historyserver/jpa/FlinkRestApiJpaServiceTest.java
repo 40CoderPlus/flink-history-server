@@ -50,10 +50,10 @@ class FlinkRestApiJpaServiceTest extends BaseTest {
     FlinkJobJpaMutator flinkJobJpaMutator;
 
     @Resource
-    FlinkJobRepository flinkJobRepository;
+    JpaJobRepository jobRepository;
 
     @Resource
-    FlinkJobXJsonRepository flinkJobXJsonRepository;
+    JobXJsonRepository jobXJsonRepository;
 
     @Test
     void overview() {
@@ -81,22 +81,22 @@ class FlinkRestApiJpaServiceTest extends BaseTest {
 
     @Test
     void json() {
-        Optional<FlinkJobXJson> empty = flinkJobXJsonRepository.findByJidAndPath("x", "y");
+        Optional<JpaJobXJson> empty = jobXJsonRepository.findByJidAndPath("x", "y");
         assertTrue(empty.isEmpty());
-        Optional<FlinkJobXJson> exists = flinkJobXJsonRepository.findByJidAndPath("1", "test");
+        Optional<JpaJobXJson> exists = jobXJsonRepository.findByJidAndPath("1", "test");
         assertTrue(exists.isPresent());
     }
 
     @BeforeEach
     void setUp() {
         flinkRestApiJpaService =
-                new FlinkRestApiJpaService(new HistoryServerProperties(), flinkJobRepository, flinkJobXJsonRepository);
-        flinkJobJpaMutator = new FlinkJobJpaMutator(flinkJobRepository);
+                new FlinkRestApiJpaService(new HistoryServerProperties(), jobRepository, jobXJsonRepository);
+        flinkJobJpaMutator = new FlinkJobJpaMutator(jobRepository);
         jobs.forEach(flinkJobJpaMutator);
     }
 
     @AfterEach
     void tearDown() {
-        flinkJobRepository.deleteAll();
+        jobRepository.deleteAll();
     }
 }

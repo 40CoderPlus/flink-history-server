@@ -18,23 +18,18 @@
  * limitations under the License.
  */
 
-package com.fortycoderplus.flink.ext.historyserver.jpa.mapper;
+package com.fortycoderplus.flink.ext.historyserver.jpa;
 
-import com.fortycoderplus.flink.ext.historyserver.domain.Job;
-import com.fortycoderplus.flink.ext.historyserver.jpa.FlinkJob;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
+import java.util.List;
+import java.util.UUID;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface FlinkJobMapper {
+public interface JpaJobRepository extends PagingAndSortingRepository<JpaJob, UUID> {
 
-    FlinkJobMapper INSTANCE = Mappers.getMapper(FlinkJobMapper.class);
+    List<JpaJob> findBy(Pageable pageable);
 
-    @Mapping(source = "task", target = "tasks")
-    Job fromJpaEntity(FlinkJob job);
-
-    @Mapping(source = "tasks", target = "task")
-    FlinkJob toJpaEntity(Job job);
+    @Query("select j.state as state ,count(j) as count from JpaJob j group by j.state")
+    List<JpaJobSummary> findJobSummaryGroupByState();
 }

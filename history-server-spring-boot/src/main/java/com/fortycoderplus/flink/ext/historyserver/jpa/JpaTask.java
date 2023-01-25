@@ -20,38 +20,29 @@
 
 package com.fortycoderplus.flink.ext.historyserver.jpa;
 
-import java.util.UUID;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Index;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.jpa.domain.AbstractPersistable;
 
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(
-        name = "flink_ext_job_json",
-        indexes = {@Index(columnList = "jid"), @Index(columnList = "path")})
-public class FlinkJobXJson extends AbstractPersistable<UUID> {
-
-    // redundancy filed for query json by jid and path
-    private String jid;
-    private String path;
-
-    @Column(columnDefinition = "TEXT")
-    private String json;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private FlinkJob job;
+@Embeddable
+public class JpaTask {
+    private int total;
+    private int created;
+    private int scheduled;
+    private int deploying;
+    private int running;
+    private int finished;
+    private int canceling;
+    private int canceled;
+    private int failed;
+    private int reconciling;
+    private int initializing;
 }

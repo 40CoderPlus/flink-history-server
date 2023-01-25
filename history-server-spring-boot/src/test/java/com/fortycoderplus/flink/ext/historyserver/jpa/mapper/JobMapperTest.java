@@ -24,18 +24,18 @@ import com.fortycoderplus.flink.ext.historyserver.domain.Job;
 import com.fortycoderplus.flink.ext.historyserver.domain.Job.Tasks;
 import com.fortycoderplus.flink.ext.historyserver.domain.JobState;
 import com.fortycoderplus.flink.ext.historyserver.domain.JobXJson;
-import com.fortycoderplus.flink.ext.historyserver.jpa.FlinkJob;
-import com.fortycoderplus.flink.ext.historyserver.jpa.FlinkTask;
+import com.fortycoderplus.flink.ext.historyserver.jpa.JpaJob;
+import com.fortycoderplus.flink.ext.historyserver.jpa.JpaTask;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class FlinkJobMapperTest {
+class JobMapperTest {
 
     @Test
     void fromJpaEntity() {
         long now = System.currentTimeMillis();
-        FlinkJob source = FlinkJob.builder()
+        JpaJob source = JpaJob.builder()
                 .jid("1")
                 .name("test")
                 .startTime(now)
@@ -43,7 +43,7 @@ class FlinkJobMapperTest {
                 .state(JobState.FINISHED)
                 .duration(1000L)
                 .lastModification(now + 1000L)
-                .task(FlinkTask.builder()
+                .task(JpaTask.builder()
                         .canceled(1)
                         .created(1)
                         .deploying(1)
@@ -58,7 +58,7 @@ class FlinkJobMapperTest {
                         .build())
                 .build();
 
-        Job target = FlinkJobMapper.INSTANCE.fromJpaEntity(source);
+        Job target = JobMapper.INSTANCE.fromJpaEntity(source);
         Assertions.assertEquals(1, target.getTasks().getCanceling());
         Assertions.assertEquals(1000L, target.getEndTime() - target.getStartTime());
     }
@@ -91,7 +91,7 @@ class FlinkJobMapperTest {
                         JobXJson.builder().jid("1").json("{}").path("test").build()))
                 .build();
 
-        FlinkJob target = FlinkJobMapper.INSTANCE.toJpaEntity(source);
+        JpaJob target = JobMapper.INSTANCE.toJpaEntity(source);
         Assertions.assertEquals(1, target.getTask().getCanceling());
         Assertions.assertEquals(1000L, target.getEndTime() - target.getStartTime());
         Assertions.assertEquals(JobState.CANCELED, target.getState());

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -46,9 +47,11 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @AllArgsConstructor
 @Entity
 @Table(name = "flink_ext_job")
-public class FlinkJob extends AbstractPersistable<UUID> {
+public class JpaJob extends AbstractPersistable<UUID> {
 
+    @Column(unique = true)
     private String jid;
+
     private String name;
 
     @Enumerated(EnumType.STRING)
@@ -59,13 +62,13 @@ public class FlinkJob extends AbstractPersistable<UUID> {
     private long duration;
     private long lastModification;
 
-    private FlinkTask task;
+    private JpaTask task;
 
     @OneToMany(mappedBy = "job", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JsonIgnore
-    private List<FlinkJobXJson> xJsons;
+    private List<JpaJobXJson> xJsons;
 
-    public void addJobXJson(FlinkJobXJson xJson) {
+    public void addJobXJson(JpaJobXJson xJson) {
         if (xJsons == null) {
             xJsons = new ArrayList<>();
         }

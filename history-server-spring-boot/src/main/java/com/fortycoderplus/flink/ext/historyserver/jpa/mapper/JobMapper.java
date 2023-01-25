@@ -18,31 +18,23 @@
  * limitations under the License.
  */
 
-package com.fortycoderplus.flink.ext.historyserver.jpa;
+package com.fortycoderplus.flink.ext.historyserver.jpa.mapper;
 
-import javax.persistence.Embeddable;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fortycoderplus.flink.ext.historyserver.domain.Job;
+import com.fortycoderplus.flink.ext.historyserver.jpa.JpaJob;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
+import org.mapstruct.factory.Mappers;
 
-@Builder
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Embeddable
-public class FlinkTask {
-    private int total;
-    private int created;
-    private int scheduled;
-    private int deploying;
-    private int running;
-    private int finished;
-    private int canceling;
-    private int canceled;
-    private int failed;
-    private int reconciling;
-    private int initializing;
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface JobMapper {
+
+    JobMapper INSTANCE = Mappers.getMapper(JobMapper.class);
+
+    @Mapping(source = "task", target = "tasks")
+    Job fromJpaEntity(JpaJob job);
+
+    @Mapping(source = "tasks", target = "task")
+    JpaJob toJpaEntity(Job job);
 }

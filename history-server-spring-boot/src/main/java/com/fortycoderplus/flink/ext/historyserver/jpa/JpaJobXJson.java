@@ -20,16 +20,38 @@
 
 package com.fortycoderplus.flink.ext.historyserver.jpa;
 
-import java.util.List;
 import java.util.UUID;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Index;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 
-public interface FlinkJobRepository extends PagingAndSortingRepository<FlinkJob, UUID> {
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(
+        name = "flink_ext_job_json",
+        indexes = {@Index(columnList = "jid"), @Index(columnList = "path")})
+public class JpaJobXJson extends AbstractPersistable<UUID> {
 
-    List<FlinkJob> findBy(Pageable pageable);
+    // redundancy filed for query json by jid and path
+    private String jid;
+    private String path;
 
-    @Query("select j.state as state ,count(j) as count from FlinkJob j group by j.state")
-    List<FlinkJobSummary> findFlinkJobSummaryGroupByState();
+    @Column(columnDefinition = "TEXT")
+    private String json;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private JpaJob job;
 }

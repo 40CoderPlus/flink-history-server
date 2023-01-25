@@ -22,7 +22,7 @@ package com.fortycoderplus.flink.ext.historyserver.jpa;
 
 import com.fortycoderplus.flink.ext.historyserver.domain.JobState;
 
-public interface FlinkJobSummary {
+public interface JpaJobSummary {
 
     /**
      * Flink Job State

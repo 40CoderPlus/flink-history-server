@@ -18,13 +18,20 @@
  * limitations under the License.
  */
 
-package com.fortycoderplus.flink.ext.historyserver.jpa;
+package com.fortycoderplus.flink.ext.historyserver.jpa.mapper;
 
-import java.util.Optional;
-import java.util.UUID;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import com.fortycoderplus.flink.ext.historyserver.domain.JobXJson;
+import com.fortycoderplus.flink.ext.historyserver.jpa.JpaJobXJson;
+import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
+import org.mapstruct.factory.Mappers;
 
-public interface FlinkJobXJsonRepository extends PagingAndSortingRepository<FlinkJobXJson, UUID> {
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface JobXJsonMapper {
 
-    Optional<FlinkJobXJson> findByJidAndPath(String jid, String path);
+    JobXJsonMapper INSTANCE = Mappers.getMapper(JobXJsonMapper.class);
+
+    JobXJson fromJpaEntity(JpaJobXJson xJson);
+
+    JpaJobXJson toJpaEntity(JobXJson xJson);
 }

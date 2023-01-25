@@ -21,25 +21,25 @@
 package com.fortycoderplus.flink.ext.historyserver.jpa;
 
 import com.fortycoderplus.flink.ext.historyserver.domain.Job;
-import com.fortycoderplus.flink.ext.historyserver.jpa.mapper.FlinkJobMapper;
-import com.fortycoderplus.flink.ext.historyserver.jpa.mapper.FlinkJobXJsonMapper;
+import com.fortycoderplus.flink.ext.historyserver.jpa.mapper.JobMapper;
+import com.fortycoderplus.flink.ext.historyserver.jpa.mapper.JobXJsonMapper;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class FlinkJobJpaMutator implements Consumer<Job> {
-    private final FlinkJobRepository flinkJobRepository;
+    private final JpaJobRepository jobRepository;
 
     @Override
     public void accept(Job job) {
-        FlinkJob entity = FlinkJobMapper.INSTANCE.toJpaEntity(job);
+        JpaJob entity = JobMapper.INSTANCE.toJpaEntity(job);
         job.getXJsons().stream()
                 .map(xJson -> {
-                    FlinkJobXJson result = FlinkJobXJsonMapper.INSTANCE.toJpaEntity(xJson);
+                    JpaJobXJson result = JobXJsonMapper.INSTANCE.toJpaEntity(xJson);
                     result.setJob(entity);
                     return result;
                 })
                 .forEach(entity::addJobXJson);
-        flinkJobRepository.save(entity);
+        jobRepository.save(entity);
     }
 }
