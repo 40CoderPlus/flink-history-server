@@ -47,7 +47,7 @@ import org.springframework.test.context.TestPropertySource;
 class FlinkRestApiJpaServiceTest extends BaseTest {
 
     FlinkRestApiJpaService flinkRestApiJpaService;
-    FlinkJobJpaMutator flinkJobJpaMutator;
+    JobJpaMutator jobJpaMutator;
 
     @Resource
     JpaJobRepository jobRepository;
@@ -91,8 +91,8 @@ class FlinkRestApiJpaServiceTest extends BaseTest {
     void setUp() {
         flinkRestApiJpaService =
                 new FlinkRestApiJpaService(new HistoryServerProperties(), jobRepository, jobXJsonRepository);
-        flinkJobJpaMutator = new FlinkJobJpaMutator(jobRepository);
-        jobs.forEach(flinkJobJpaMutator);
+        jobJpaMutator = new JobJpaMutator(jobRepository);
+        jobs.forEach(jobJpaMutator);
     }
 
     @AfterEach

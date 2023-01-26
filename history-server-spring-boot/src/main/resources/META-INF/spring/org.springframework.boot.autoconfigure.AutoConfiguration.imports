@@ -1,2 +1,2 @@
 com.fortycoderplus.flink.ext.historyserver.HistoryServerAutoConfigure
-com.fortycoderplus.flink.ext.historyserver.jpa.FlinkHistoryJpaAutoConfigure
+com.fortycoderplus.flink.ext.historyserver.jpa.HistoryJpaAutoConfigure

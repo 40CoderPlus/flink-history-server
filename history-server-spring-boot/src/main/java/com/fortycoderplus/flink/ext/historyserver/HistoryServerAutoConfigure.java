@@ -21,7 +21,7 @@
 package com.fortycoderplus.flink.ext.historyserver;
 
 import com.fortycoderplus.flink.ext.historyserver.domain.Job;
-import com.fortycoderplus.flink.ext.historyserver.jpa.FlinkHistoryJpaAutoConfigure;
+import com.fortycoderplus.flink.ext.historyserver.jpa.HistoryJpaAutoConfigure;
 import java.util.function.Consumer;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@AutoConfigureAfter(FlinkHistoryJpaAutoConfigure.class)
+@AutoConfigureAfter(HistoryJpaAutoConfigure.class)
 @EnableConfigurationProperties(HistoryServerProperties.class)
 public class HistoryServerAutoConfigure {
 

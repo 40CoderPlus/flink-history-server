@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class FlinkJobJpaMutator implements Consumer<Job> {
+public class JobJpaMutator implements Consumer<Job> {
     private final JpaJobRepository jobRepository;
 
     @Override

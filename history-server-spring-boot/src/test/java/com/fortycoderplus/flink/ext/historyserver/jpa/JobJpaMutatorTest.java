@@ -40,9 +40,9 @@ import org.springframework.test.context.TestPropertySource;
 @DataJpaTest
 @EnableJpaRepositories(basePackages = {"com.fortycoderplus.flink.ext.*"})
 @EntityScan(basePackages = "com.fortycoderplus.flink.ext.*")
-class FlinkJobJpaMutatorTest extends BaseTest {
+class JobJpaMutatorTest extends BaseTest {
 
-    FlinkJobJpaMutator flinkJobJpaMutator;
+    JobJpaMutator jobJpaMutator;
 
     @Resource
     JpaJobRepository jobRepository;
@@ -52,7 +52,7 @@ class FlinkJobJpaMutatorTest extends BaseTest {
 
     @Test
     void accept() {
-        jobs.forEach(flinkJobJpaMutator);
+        jobs.forEach(jobJpaMutator);
         assertEquals(3L, jobRepository.count());
         jobRepository.findAll().forEach(job -> assertEquals(1L, job.getXJsons().size()));
         Optional<JpaJobXJson> xJson = jobXJsonRepository.findByJidAndPath("1", "test");
@@ -62,7 +62,7 @@ class FlinkJobJpaMutatorTest extends BaseTest {
 
     @BeforeEach
     void setUp() {
-        flinkJobJpaMutator = new FlinkJobJpaMutator(jobRepository);
+        jobJpaMutator = new JobJpaMutator(jobRepository);
     }
 
     @AfterEach

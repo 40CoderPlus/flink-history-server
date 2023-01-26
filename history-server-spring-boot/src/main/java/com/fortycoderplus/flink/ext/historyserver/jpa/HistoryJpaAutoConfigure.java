@@ -36,12 +36,12 @@ import org.springframework.data.jpa.support.ClasspathScanningPersistenceUnitPost
 @ConditionalOnClass(ClasspathScanningPersistenceUnitPostProcessor.class)
 @EnableJpaRepositories(basePackages = "com.fortycoderplus.flink.ext.historyserver.jpa")
 @EntityScan(basePackages = "com.fortycoderplus.flink.ext.historyserver.jpa")
-public class FlinkHistoryJpaAutoConfigure {
+public class HistoryJpaAutoConfigure {
 
     @Bean("archivedJobConsumer")
     @ConditionalOnMissingBean
     public Consumer<Job> archivedJobConsumer(JpaJobRepository jobRepository) {
-        return new FlinkJobJpaMutator(jobRepository);
+        return new JobJpaMutator(jobRepository);
     }
 
     @Bean
