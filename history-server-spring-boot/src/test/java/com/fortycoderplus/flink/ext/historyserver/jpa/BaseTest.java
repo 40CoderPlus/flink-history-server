@@ -28,8 +28,8 @@ import java.util.List;
 
 class BaseTest {
 
-    static long now = System.currentTimeMillis();
-    static List<Job> jobs = List.of(
+    static final long now = System.currentTimeMillis();
+    static final List<Job> jobs = List.of(
             Job.builder()
                     .jid("1")
                     .name("test1")

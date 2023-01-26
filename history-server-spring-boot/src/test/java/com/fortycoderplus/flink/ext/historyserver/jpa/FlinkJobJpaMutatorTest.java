@@ -21,7 +21,9 @@
 package com.fortycoderplus.flink.ext.historyserver.jpa;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Optional;
 import javax.annotation.Resource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,9 +55,9 @@ class FlinkJobJpaMutatorTest extends BaseTest {
         jobs.forEach(flinkJobJpaMutator);
         assertEquals(3L, jobRepository.count());
         jobRepository.findAll().forEach(job -> assertEquals(1L, job.getXJsons().size()));
-        assertEquals(
-                "{'foo':'bar'}",
-                jobXJsonRepository.findByJidAndPath("1", "test").get().getJson());
+        Optional<JpaJobXJson> xJson = jobXJsonRepository.findByJidAndPath("1", "test");
+        assertTrue(xJson.isPresent());
+        assertEquals("{'foo':'bar'}", xJson.map(JpaJobXJson::getJson).orElseThrow());
     }
 
     @BeforeEach

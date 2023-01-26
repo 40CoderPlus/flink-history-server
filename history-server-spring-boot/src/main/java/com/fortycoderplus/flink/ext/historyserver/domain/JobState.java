@@ -20,19 +20,10 @@
 
 package com.fortycoderplus.flink.ext.historyserver.domain;
 
-import java.util.Arrays;
-
 public enum JobState {
     RUNNING,
     CANCELED,
     FAILED,
 
     FINISHED;
-
-    public static JobState from(String state) {
-        return Arrays.stream(JobState.values())
-                .filter(s -> s.name().equalsIgnoreCase(state))
-                .findAny()
-                .orElse(FINISHED);
-    }
 }
