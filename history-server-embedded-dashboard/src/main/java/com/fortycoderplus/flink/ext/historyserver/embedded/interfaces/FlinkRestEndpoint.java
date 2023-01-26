@@ -57,7 +57,7 @@ public class FlinkRestEndpoint {
     @RequestMapping(method = RequestMethod.GET, path = "/jobs/{jid}/**")
     public String path(@PathVariable String jid) {
         return flinkRestApiService
-                .json(
+                .xJson(
                         jid,
                         ServletUriComponentsBuilder.fromCurrentRequest().build().getPath())
                 .getJson();

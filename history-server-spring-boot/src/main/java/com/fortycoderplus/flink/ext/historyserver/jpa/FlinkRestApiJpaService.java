@@ -89,7 +89,7 @@ public class FlinkRestApiJpaService implements FlinkRestApiService {
     }
 
     @Override
-    public JobXJson json(String jid, String path) {
+    public JobXJson xJson(String jid, String path) {
         Optional<JpaJobXJson> xJson = jobXJsonRepository.findByJidAndPath(jid, path);
         return JobXJson.builder()
                 .json(xJson.map(JpaJobXJson::getJson).orElse("{}"))

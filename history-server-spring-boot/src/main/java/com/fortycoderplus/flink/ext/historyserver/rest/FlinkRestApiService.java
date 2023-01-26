@@ -89,5 +89,5 @@ public interface FlinkRestApiService {
      * @param path the path of suffix /jobs/{id}
      * @return JobXJson
      */
-    JobXJson json(String jid, String path);
+    JobXJson xJson(String jid, String path);
 }
