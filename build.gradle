@@ -97,7 +97,7 @@ subprojects {
 
                 pom {
                     name = "Flink History Server Extension :: $project.name"
-                    description = 'Flink History Server Extension :: $project.name'
+                    description = "Flink History Server Extension :: $project.name"
                     url = 'https://github.com/40coderplus/flink-history-server'
                     developers {
                         developer {
