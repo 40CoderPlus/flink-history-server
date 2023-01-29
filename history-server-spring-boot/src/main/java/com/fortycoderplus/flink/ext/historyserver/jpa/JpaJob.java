@@ -31,6 +31,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -46,7 +47,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "flink_ext_job")
+@Table(name = "flink_ext_job", indexes = @Index(columnList = "name"))
 public class JpaJob extends AbstractPersistable<UUID> {
 
     @Column(unique = true)
