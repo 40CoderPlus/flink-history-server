@@ -29,7 +29,10 @@ import com.fortycoderplus.flink.ext.historyserver.domain.Overview.OverviewBuilde
 import com.fortycoderplus.flink.ext.historyserver.jpa.mapper.JobMapper;
 import com.fortycoderplus.flink.ext.historyserver.rest.FlinkRestApiService;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.apache.flink.runtime.util.EnvironmentInformation;
@@ -39,6 +42,8 @@ import org.springframework.data.domain.Sort.Direction;
 
 @AllArgsConstructor
 public class FlinkRestApiJpaService implements FlinkRestApiService {
+
+    private static final String JOBMANAGER_CONFIG_PATH_FORMATTER = "/jobs/%s/jobmanager/config";
 
     private final HistoryServerProperties historyServerProperties;
 
@@ -92,7 +97,18 @@ public class FlinkRestApiJpaService implements FlinkRestApiService {
     public JobXJson xJson(String jid, String path) {
         Optional<JpaJobXJson> xJson = jobXJsonRepository.findByJidAndPath(jid, path);
         return JobXJson.builder()
-                .json(xJson.map(JpaJobXJson::getJson).orElse("{}"))
+                .json(xJson.map(JpaJobXJson::getJson).orElseGet(bind(apply, jid, path)))
                 .build();
     }
+
+    private static Supplier<String> bind(BiFunction<String, String, String> bifn, String val1, String val2) {
+        return () -> bifn.apply(val1, val2);
+    }
+
+    private static final BiFunction<String, String, String> apply = (jid, path) -> {
+        if (Objects.equals(String.format(JOBMANAGER_CONFIG_PATH_FORMATTER, jid), path)) {
+            return "[]";
+        }
+        return "{}";
+    };
 }
