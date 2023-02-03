@@ -54,7 +54,7 @@ Filesystem configuration example:
 
 Build `HistoryServerRefreshLocation` example:
 
-```json
+```java
 HistoryServerRefreshLocation.builder()
     .fs(FileSystem.getLocalFileSystem())
     .path(new Path("data"))
