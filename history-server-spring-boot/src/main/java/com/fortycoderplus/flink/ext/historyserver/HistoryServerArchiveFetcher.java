@@ -156,13 +156,13 @@ public class HistoryServerArchiveFetcher {
 
             try {
                 JsonNode archive = mapper.readTree(output.toByteArray());
-                List<HistoryServerArchivedJson> archivedJsons = StreamSupport.stream(
+                List<JobXJson> archivedJsons = StreamSupport.stream(
                                 archive.get(ARCHIVE).spliterator(), false)
                         .map(part -> {
                             String path = part.get(PATH).asText();
                             String json = part.get(JSON).asText();
-                            return HistoryServerArchivedJson.builder()
-                                    .jobId(jobId)
+                            return JobXJson.builder()
+                                    .jid(jobId)
                                     .path(path)
                                     .json(json)
                                     .build();
@@ -186,7 +186,7 @@ public class HistoryServerArchiveFetcher {
                         .map(j -> JobXJson.builder()
                                 .json(j.getJson())
                                 .path(j.getPath())
-                                .jid(j.getJobId())
+                                .jid(j.getJid())
                                 .build())
                         .collect(Collectors.toList()));
                 return job;
