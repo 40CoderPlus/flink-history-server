@@ -183,11 +183,6 @@ public class HistoryServerArchiveFetcher {
                         .orElseThrow(() -> new IllegalArgumentException("Job overview not found"));
                 job.setXJsons(archivedJsons.stream()
                         .filter(j -> !j.getPath().equals(JOBS_OVERVIEW))
-                        .map(j -> JobXJson.builder()
-                                .json(j.getJson())
-                                .path(j.getPath())
-                                .jid(j.getJid())
-                                .build())
                         .collect(Collectors.toList()));
                 return job;
             } catch (NullPointerException npe) {
