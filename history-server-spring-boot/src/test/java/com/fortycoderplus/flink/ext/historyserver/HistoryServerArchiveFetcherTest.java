@@ -24,8 +24,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fortycoderplus.flink.ext.historyserver.domain.Job;
 import com.fortycoderplus.flink.ext.historyserver.domain.JobXJson;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
 import org.junit.jupiter.api.Test;
@@ -35,12 +37,37 @@ class HistoryServerArchiveFetcherTest {
     @Test
     void fetchArchives() {
         FileSystem fs = FileSystem.getLocalFileSystem();
-        Consumer<Job> testConsumer = job -> assertEquals(
-                1L, job.getXJsons().stream().map(JobXJson::getJid).distinct().count());
-        HistoryServerArchiveFetcher fetcher = new HistoryServerArchiveFetcher(testConsumer, archive -> {});
+        JobHolderConsumer consumer = new JobHolderConsumer();
+        HistoryServerArchiveFetcher fetcher = new HistoryServerArchiveFetcher(consumer, archive -> {});
         fetcher.fetchArchives(List.of(HistoryServerRefreshLocation.builder()
                 .fs(fs)
                 .path(new Path(fs.getWorkingDirectory().getParent().getParent(), "data"))
                 .build()));
+
+        assertEquals(2, consumer.getJobs().size());
+        consumer.getJobs()
+                .forEach(job -> assertEquals(
+                        1L,
+                        job.getXJsons().stream()
+                                .map(JobXJson::getJid)
+                                .distinct()
+                                .count()));
+        assertEquals(
+                List.of("019656defad3d1cf1ef40906389d2764", "536183bc448b0136867dfc4fadb69cb8"),
+                consumer.getJobs().stream().map(Job::getJid).sorted().collect(Collectors.toList()));
+    }
+
+    static class JobHolderConsumer implements Consumer<Job> {
+
+        private final List<Job> jobs = new ArrayList<>();
+
+        @Override
+        public void accept(Job job) {
+            jobs.add(job);
+        }
+
+        public List<Job> getJobs() {
+            return jobs;
+        }
     }
 }

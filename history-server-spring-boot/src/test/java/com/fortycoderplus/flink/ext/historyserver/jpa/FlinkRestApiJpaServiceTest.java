@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.fortycoderplus.flink.ext.historyserver.HistoryServerProperties;
 import com.fortycoderplus.flink.ext.historyserver.domain.Job;
 import com.fortycoderplus.flink.ext.historyserver.domain.Overview;
+import com.fortycoderplus.flink.ext.historyserver.rest.FlinkRestApiService;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
@@ -46,7 +47,7 @@ import org.springframework.test.context.TestPropertySource;
 @EntityScan(basePackages = "com.fortycoderplus.flink.ext.*")
 class FlinkRestApiJpaServiceTest extends BaseTest {
 
-    FlinkRestApiJpaService flinkRestApiJpaService;
+    FlinkRestApiService flinkRestApiService;
     JobJpaMutator jobJpaMutator;
 
     @Resource
@@ -57,7 +58,7 @@ class FlinkRestApiJpaServiceTest extends BaseTest {
 
     @Test
     void overview() {
-        Overview overview = flinkRestApiJpaService.overview();
+        Overview overview = flinkRestApiService.overview();
         assertEquals(1L, overview.getJobsFailed());
         assertEquals(1L, overview.getJobsCancelled());
         assertEquals(1L, overview.getJobsFinished());
@@ -65,9 +66,9 @@ class FlinkRestApiJpaServiceTest extends BaseTest {
 
     @Test
     void latest() {
-        List<Job> top1 = flinkRestApiJpaService.latest(1).getJobs();
-        List<Job> top2 = flinkRestApiJpaService.latest(2).getJobs();
-        List<Job> top3 = flinkRestApiJpaService.latest(3).getJobs();
+        List<Job> top1 = flinkRestApiService.latest(1).getJobs();
+        List<Job> top2 = flinkRestApiService.latest(2).getJobs();
+        List<Job> top3 = flinkRestApiService.latest(3).getJobs();
 
         assertEquals(1L, top1.size());
         assertEquals("3", top1.get(0).getJid());
@@ -89,7 +90,7 @@ class FlinkRestApiJpaServiceTest extends BaseTest {
 
     @BeforeEach
     void setUp() {
-        flinkRestApiJpaService =
+        flinkRestApiService =
                 new FlinkRestApiJpaService(new HistoryServerProperties(), jobRepository, jobXJsonRepository);
         jobJpaMutator = new JobJpaMutator(jobRepository);
         jobs.forEach(jobJpaMutator);
