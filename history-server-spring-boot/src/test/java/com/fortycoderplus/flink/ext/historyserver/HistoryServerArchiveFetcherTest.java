@@ -38,13 +38,14 @@ class HistoryServerArchiveFetcherTest {
     void fetchArchives() {
         FileSystem fs = FileSystem.getLocalFileSystem();
         JobHolderConsumer consumer = new JobHolderConsumer();
-        HistoryServerArchiveFetcher fetcher = new HistoryServerArchiveFetcher(consumer, archive -> {});
+        HistoryServerArchiveFetcher fetcher = new HistoryServerArchiveFetcher(consumer, archive -> {
+        });
         fetcher.fetchArchives(List.of(HistoryServerRefreshLocation.builder()
                 .fs(fs)
                 .path(new Path(fs.getWorkingDirectory().getParent().getParent(), "data"))
                 .build()));
 
-        assertEquals(2, consumer.getJobs().size());
+        assertEquals(4, consumer.getJobs().size());
         consumer.getJobs()
                 .forEach(job -> assertEquals(
                         1L,
@@ -53,7 +54,7 @@ class HistoryServerArchiveFetcherTest {
                                 .distinct()
                                 .count()));
         assertEquals(
-                List.of("019656defad3d1cf1ef40906389d2764", "536183bc448b0136867dfc4fadb69cb8"),
+                List.of("019656defad3d1cf1ef40906389d2764", "536183bc448b0136867dfc4fadb69cb8", "939b749e4c3d0dacb209c2b77a7b33c6", "e7ac49cbd6a887ef69a482ba46cd4ca8"),
                 consumer.getJobs().stream().map(Job::getJid).sorted().collect(Collectors.toList()));
     }
 
