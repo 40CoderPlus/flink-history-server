@@ -44,7 +44,7 @@ public interface FlinkRestApiService {
 
     default Config config(long refreshInterval) {
         DashboardConfiguration configuration =
-                DashboardConfiguration.from(refreshInterval, ZonedDateTime.now(), false, false, true);
+                DashboardConfiguration.from(refreshInterval, ZonedDateTime.now(), false, false, true, true);
         return Config.builder()
                 .refreshInterval(configuration.getRefreshInterval())
                 .flinkVersion(configuration.getFlinkVersion())
@@ -69,6 +69,7 @@ public interface FlinkRestApiService {
     /**
      * For Flink Rest Endpoint : /jobs/overview
      * Order by job end time
+     *
      * @return List<Job>
      */
     default JobsOverview latest() {
@@ -78,6 +79,7 @@ public interface FlinkRestApiService {
     /**
      * For Flink Rest Endpoint : /jobs/overview
      * Order by job end time
+     *
      * @param size number of page size.
      * @return List<Job>
      */
@@ -85,7 +87,8 @@ public interface FlinkRestApiService {
 
     /**
      * For Flink Rest Endpoint : /jobs/{id}/**
-     * @param jid  Job ID, path variable of {id}
+     *
+     * @param jid Job ID, path variable of {id}
      * @param path the path of suffix /jobs/{id}
      * @return JobXJson
      */
