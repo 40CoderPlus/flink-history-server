@@ -61,6 +61,9 @@ class HistoryServerArchiveFetcherTest {
                         "ea71b9a630c2d7102310c234cfb85933",
                         "f756069678a3aa03fee576cc8c5ac409"),
                 consumer.getJobs().stream().map(Job::getJid).sorted().collect(Collectors.toList()));
+
+        assertEquals(
+                2, consumer.getJobs().stream().map(Job::getState).distinct().count());
     }
 
     static class JobHolderConsumer implements Consumer<Job> {
