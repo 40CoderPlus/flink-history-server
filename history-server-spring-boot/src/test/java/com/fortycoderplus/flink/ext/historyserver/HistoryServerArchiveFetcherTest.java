@@ -44,7 +44,7 @@ class HistoryServerArchiveFetcherTest {
                 .path(new Path(fs.getWorkingDirectory().getParent().getParent(), "data"))
                 .build()));
 
-        assertEquals(4, consumer.getJobs().size());
+        assertEquals(6, consumer.getJobs().size());
         consumer.getJobs()
                 .forEach(job -> assertEquals(
                         1L,
@@ -57,7 +57,9 @@ class HistoryServerArchiveFetcherTest {
                         "019656defad3d1cf1ef40906389d2764",
                         "536183bc448b0136867dfc4fadb69cb8",
                         "939b749e4c3d0dacb209c2b77a7b33c6",
-                        "e7ac49cbd6a887ef69a482ba46cd4ca8"),
+                        "e7ac49cbd6a887ef69a482ba46cd4ca8",
+                        "ea71b9a630c2d7102310c234cfb85933",
+                        "f756069678a3aa03fee576cc8c5ac409"),
                 consumer.getJobs().stream().map(Job::getJid).sorted().collect(Collectors.toList()));
     }
 
