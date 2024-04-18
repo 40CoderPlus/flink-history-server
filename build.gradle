@@ -2,8 +2,7 @@ buildscript {
     ext {
         //@formatter:off
         flinkVersion      = '1.18.0'
-        springbootVersion = '2.7.10'
-        junitVersion      = '5.9.0'
+        springbootVersion = '3.2.0'
         hadoopVersion     = '3.3.4'
         //@formatter:on
     }
@@ -17,11 +16,12 @@ buildscript {
 
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:$springbootVersion"
-        classpath "io.spring.gradle:dependency-management-plugin:1.1.0"
+        classpath "io.spring.gradle:dependency-management-plugin:1.1.4"
         classpath "com.palantir.baseline:gradle-baseline-java:4.185.0"
         classpath "com.diffplug.spotless:spotless-plugin-gradle:6.12.1"
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.5.0.2730"
         classpath 'org.owasp:dependency-check-gradle:7.4.4'
+        classpath "org.openrewrite:plugin:6.11.2"
     }
 }
 
@@ -34,12 +34,13 @@ subprojects {
     apply plugin: 'maven-publish'
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'idea'
-
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    apply plugin: 'org.openrewrite.rewrite'
 
     repositories {
         mavenLocal()
+        maven {
+            url "https://repo.huaweicloud.com/repository/maven/"
+        }
         mavenCentral()
     }
 
@@ -69,14 +70,21 @@ subprojects {
         implementation "org.apache.flink:flink-runtime:$flinkVersion"
 
         // test:junit
-        testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
-        testImplementation "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+        testImplementation "org.junit.jupiter:junit-jupiter-api"
+        testImplementation "org.junit.jupiter:junit-jupiter-engine"
         // test:springboot
-        testImplementation('org.springframework.boot:spring-boot-starter-test')
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+        // rewrite
+        rewrite "org.openrewrite.recipe:rewrite-spring:5.7.0"
+    }
+
+    rewrite {
+        activeRecipe("org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_2")
     }
 
     plugins.withType(JavaPlugin) {
-        project.sourceCompatibility = JavaVersion.VERSION_11
+        project.sourceCompatibility = JavaVersion.VERSION_17
     }
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"

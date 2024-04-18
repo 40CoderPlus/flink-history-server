@@ -23,10 +23,10 @@ package com.fortycoderplus.flink.ext.historyserver.jpa;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface JpaJobRepository extends PagingAndSortingRepository<JpaJob, UUID> {
+public interface JpaJobRepository extends JpaRepository<JpaJob, UUID> {
 
     boolean existsByJid(String jid);
 

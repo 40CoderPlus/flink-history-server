@@ -26,9 +26,8 @@ import com.fortycoderplus.flink.ext.historyserver.domain.Overview;
 import com.fortycoderplus.flink.ext.historyserver.rest.FlinkRestApiService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -39,22 +38,22 @@ public class FlinkRestEndpoint {
 
     private FlinkRestApiService flinkRestApiService;
 
-    @RequestMapping(method = RequestMethod.GET, path = "/config")
+    @GetMapping("/config")
     public Config dashboardConfiguration() {
         return flinkRestApiService.config();
     }
 
-    @RequestMapping(method = RequestMethod.GET, path = "/overview")
+    @GetMapping("/overview")
     public Overview overview() {
         return flinkRestApiService.overview();
     }
 
-    @RequestMapping(method = RequestMethod.GET, path = "/jobs/overview")
+    @GetMapping("/jobs/overview")
     public JobsOverview jobsOverview() {
         return flinkRestApiService.latest();
     }
 
-    @RequestMapping(method = RequestMethod.GET, path = "/jobs/{jid}/**")
+    @GetMapping("/jobs/{jid}/**")
     public String path(@PathVariable String jid) {
         return flinkRestApiService
                 .xJson(
