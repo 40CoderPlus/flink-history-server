@@ -106,7 +106,7 @@ public class FlinkRestApiJpaService implements FlinkRestApiService {
     }
 
     private static final BiFunction<String, String, String> apply = (jid, path) -> {
-        if (Objects.equals(JOBMANAGER_CONFIG_PATH_FORMATTER.formatted(jid), path)) {
+        if (Objects.equals(String.format(JOBMANAGER_CONFIG_PATH_FORMATTER, jid), path)) {
             return "[]";
         }
         return "{}";
