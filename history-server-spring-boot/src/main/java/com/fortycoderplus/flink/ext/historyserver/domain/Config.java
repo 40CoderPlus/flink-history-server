@@ -21,43 +21,20 @@
 package com.fortycoderplus.flink.ext.historyserver.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 
 @Builder
-@AllArgsConstructor
-@Data
-public class Config {
-    @JsonProperty("refresh-interval")
-    private final long refreshInterval;
-
-    @JsonProperty("timezone-name")
-    private final String timeZoneName;
-
-    @JsonProperty("timezone-offset")
-    private final int timeZoneOffset;
-
-    @JsonProperty("flink-version")
-    private final String flinkVersion;
-
-    @JsonProperty("flink-revision")
-    private final String flinkRevision;
-
-    @JsonProperty("features")
-    private final Features features;
-
+public record Config(
+        @JsonProperty("refresh-interval") long refreshInterval,
+        @JsonProperty("timezone-name") String timeZoneName,
+        @JsonProperty("timezone-offset") int timeZoneOffset,
+        @JsonProperty("flink-version") String flinkVersion,
+        @JsonProperty("flink-revision") String flinkRevision,
+        @JsonProperty("features") Features features) {
     @Builder
-    @AllArgsConstructor
-    @Data
-    public static class Features {
-        @JsonProperty("web-submit")
-        private final boolean webSubmitEnabled;
-
-        @JsonProperty("web-cancel")
-        private final boolean webCancelEnabled;
-
-        @JsonProperty("web-history")
-        private final boolean isHistoryServer;
+    public record Features(
+            @JsonProperty("web-submit") boolean webSubmitEnabled,
+            @JsonProperty("web-cancel") boolean webCancelEnabled,
+            @JsonProperty("web-history") boolean isHistoryServer) {
     }
 }
