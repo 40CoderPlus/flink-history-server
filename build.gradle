@@ -80,7 +80,7 @@ subprojects {
     }
 
     rewrite {
-        activeRecipe("org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_2")
+        activeRecipe("org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_3")
     }
 
     plugins.withType(JavaPlugin) {
