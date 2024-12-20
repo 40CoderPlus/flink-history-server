@@ -2,7 +2,7 @@ buildscript {
     ext {
         //@formatter:off
         flinkVersion      = '1.18.0'
-        springbootVersion = '3.2.0'
+        springbootVersion = '3.3.5'
         hadoopVersion     = '3.3.4'
         //@formatter:on
     }
@@ -21,7 +21,7 @@ buildscript {
         classpath "com.diffplug.spotless:spotless-plugin-gradle:6.12.1"
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.5.0.2730"
         classpath 'org.owasp:dependency-check-gradle:7.4.4'
-        classpath "org.openrewrite:plugin:6.11.2"
+        classpath "org.openrewrite:plugin:6.28.3"
     }
 }
 
@@ -76,7 +76,7 @@ subprojects {
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
         // rewrite
-        rewrite "org.openrewrite.recipe:rewrite-spring:5.7.0"
+        rewrite "org.openrewrite.recipe:rewrite-spring:5.25.0"
     }
 
     rewrite {
